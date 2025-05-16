@@ -1,0 +1,6 @@
+@Breeze_HostAddress = http://localhost:5145
+
+GET {{Breeze_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
