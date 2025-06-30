@@ -3,6 +3,7 @@ using Core.Interfaces;
 using Infrastructure.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Core.Specifications;
 
 namespace Breeze.Controllers
 {
@@ -17,9 +18,10 @@ namespace Breeze.Controllers
             this._repo =repo;
         }
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Product>>> GetProducts(string? brand,string? type,string? sort)
+        public async Task<ActionResult<IEnumerable<Product>>> GetProducts([FromQuery]ProductSpecParams specParams)
         {
-            var result= await _repo.ListAllAsync();
+            var spec= new ProductSpecification(specParams);
+            var result = await _repo.ListAsync(spec);
             return Ok(result);
         }
 
@@ -34,13 +36,15 @@ namespace Breeze.Controllers
         [HttpGet("brands")]
         public async Task<ActionResult<IReadOnlyList<string>>> GetProductBrands()
         {
-            return Ok();
+            var spec=new BrandListSpecification();
+            return Ok(await _repo.ListAsync(spec));
         }
 
         [HttpGet("types")]
         public async Task<ActionResult<IReadOnlyList<string>>> GetProductTypes()
         {
-            return Ok();
+            var spec = new TypeListSpecification();
+            return Ok(await _repo.ListAsync(spec));
         }
 
         [HttpPost]

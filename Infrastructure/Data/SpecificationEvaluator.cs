@@ -16,7 +16,57 @@ namespace Infrastructure.Data
             {
                 query = query.Where(specification.Criteria);
             }
+            if (specification.OrderBy != null)
+            {
+                query.OrderBy(specification.OrderBy);
+            }
+            if (specification.OrderByDescending!=null)
+            {
+                query.OrderByDescending(specification.OrderByDescending);
+            }
+            if (specification.isDistinct)
+            {
+                query = query.Distinct();
+            }
+            if(specification.isPagingEnabled)
+            {
+                query = query.Skip(specification.Skip).Take(specification.Take);
+            }
+
+
             return query;
         }
+        public static IQueryable<TResult> GetQuery<TSpec,TResult>(IQueryable<T> query, ISpecification<T,TResult> specification)
+        {
+            if (specification.Criteria != null)
+            {
+                query = query.Where(specification.Criteria);
+            }
+            if (specification.OrderBy != null)
+            {
+                query.OrderBy(specification.OrderBy);
+            }
+            if (specification.OrderByDescending != null)
+            {
+                query.OrderByDescending(specification.OrderByDescending);
+            }
+
+            var selectQuery=query as IQueryable<TResult>;
+
+            if (specification.Select != null)
+            {
+                selectQuery = query.Select(specification.Select);
+            }
+            if (specification.isDistinct)
+            {
+                selectQuery = selectQuery?.Distinct();
+            }
+            if (specification.isPagingEnabled)
+            {
+                selectQuery = selectQuery?.Skip(specification.Skip).Take(specification.Take);
+            }
+            return selectQuery ?? query.Cast<TResult>();    
+        }
+
     }
 }
