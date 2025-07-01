@@ -19,6 +19,7 @@ namespace Core.Interfaces
         int Take { get; }
         int Skip { get; }
         bool isPagingEnabled { get; }
+        IQueryable<T> ApplyCriteria(IQueryable<T> query);
 
     }
 

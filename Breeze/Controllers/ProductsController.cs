@@ -4,12 +4,11 @@ using Infrastructure.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Core.Specifications;
+using Breeze.RequestHelpers;
 
 namespace Breeze.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class ProductsController : ControllerBase
+    public class ProductsController : BaseApiController
     {
         private readonly IGenericRepository<Product> _repo;
 
@@ -21,9 +20,8 @@ namespace Breeze.Controllers
         public async Task<ActionResult<IEnumerable<Product>>> GetProducts([FromQuery]ProductSpecParams specParams)
         {
             var spec= new ProductSpecification(specParams);
-            var result = await _repo.ListAsync(spec);
-            return Ok(result);
-        }
+            return await CreatePagedResult(_repo,spec , specParams.PageIndex, specParams.PageSize);
+        }   
 
         [HttpGet("{id:int}")]
         public async Task<ActionResult<Product>> GetProduct(int id)
