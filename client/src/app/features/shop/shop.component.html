@@ -1,7 +1,13 @@
-<div class="grid grid-cols-5 gap-7">
+<div class="flex flex-col gap-3">
+  <div class="flex justify-end">
+    <button mat-stroked-button (click)="openFiltersDialog()">
+      <mat-icon>filter_list</mat-icon>
+      Filters
+    </button>
+  </div>
+  <div class="grid grid-cols-5 gap-7">
   @for (product of products; track product.id){
-    <mat-card appearance="raised">
-      <img src="{{product.pictureUrl}}" alt="image of {{product.name}}" />
-    </mat-card>
+    <app-product-item [product]="product"></app-product-item>
   }
+</div>
 </div>
