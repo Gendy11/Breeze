@@ -9,7 +9,7 @@ import { ShopComponent } from "./features/shop/shop.component";
 @Component({
   selector: 'app-root',
   standalone:true,
-  imports: [HeaderComponent, ShopComponent],
+  imports: [HeaderComponent, ShopComponent, RouterOutlet],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
