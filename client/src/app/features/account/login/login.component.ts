@@ -31,7 +31,7 @@ export class LoginComponent {
   onSubmit(){
     this.accountService.login(this.loginForm.value).subscribe({
       next: user=>{
-        this.accountService.getuserInfo();
+        this.accountService.getuserInfo().subscribe();
         this.router.navigateByUrl('/shop');
       }
     })
