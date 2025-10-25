@@ -39,5 +39,12 @@ html {
   color: var(--mat-sys-on-surface);
   font: var(--mat-sys-body-medium);
 }
+.text-primary{
+  color: #7d00fa;
+}
+
+.mdc-notched-outline__notch{
+  border-right-style:none !important
+}
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
