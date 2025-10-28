@@ -7,17 +7,20 @@ import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { AccountService } from '../../core/services/account.service';
 import { BusyService } from '../../core/services/busy.service';
 import {MatProgressBar} from '@angular/material/progress-bar'
+import { CartService } from '../../core/services/cart.service';
+import {MatBadgeModule} from '@angular/material/badge';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [MatIconModule, MatButton, RouterLink, MatProgressBar, RouterLinkActive, MatFabButton],
+  imports: [MatIconModule, MatButton, RouterLink, MatProgressBar, RouterLinkActive, MatFabButton,MatBadgeModule],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss'
 })
 export class HeaderComponent {
   accountService = inject(AccountService)
   busyService = inject(BusyService)
+  cartService = inject(CartService)
   private router = inject(Router)
   
 

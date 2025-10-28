@@ -7,6 +7,7 @@ import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatFormField, MatInput, MatLabel } from '@angular/material/input';
 import { MatDivider } from "@angular/material/divider";
+import { CartService } from '../../../core/services/cart.service';
 
 @Component({
   selector: 'app-product-details',
@@ -25,6 +26,7 @@ import { MatDivider } from "@angular/material/divider";
 export class ProductDetailsComponent implements OnInit {
 
   private shopService = inject(ShopService)
+  public cartService = inject(CartService)
   private activatedRoute = inject(ActivatedRoute);
 
   product?: Product;
