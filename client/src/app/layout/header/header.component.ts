@@ -9,11 +9,25 @@ import { BusyService } from '../../core/services/busy.service';
 import {MatProgressBar} from '@angular/material/progress-bar'
 import { CartService } from '../../core/services/cart.service';
 import {MatBadgeModule} from '@angular/material/badge';
+import {MatMenu, MatMenuItem, MatMenuTrigger} from '@angular/material/menu';
+import { MatDivider } from '@angular/material/divider';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [MatIconModule, MatButton, RouterLink, MatProgressBar, RouterLinkActive, MatFabButton,MatBadgeModule],
+  imports: [
+    MatIconModule,
+    MatButton,
+    RouterLink,
+    MatProgressBar,
+    RouterLinkActive,
+    MatFabButton,
+    MatBadgeModule,
+    MatMenuTrigger,
+    MatMenu,
+    MatDivider,
+    MatMenuItem
+  ],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss'
 })

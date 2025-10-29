@@ -5,10 +5,11 @@ import { CurrencyPipe } from '@angular/common';
 import { MatIcon } from '@angular/material/icon';
 import { CartService } from '../../../core/services/cart.service';
 import { RouterLink } from '@angular/router';
+import { MatButton } from '@angular/material/button';
 
 @Component({
   selector: 'app-product-item',
-  imports: [MatCard, MatCardContent, CurrencyPipe, MatCardActions, MatIcon, RouterLink],
+  imports: [MatCard, MatCardContent, CurrencyPipe, MatCardActions, MatIcon, RouterLink, MatButton],
   templateUrl: './product-item.component.html',
   styleUrl: './product-item.component.scss'
 })
