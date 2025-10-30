@@ -29,7 +29,7 @@ namespace Breeze.Controllers
             ModelState.AddModelError("Problem", "This is a validation error");
             return ValidationProblem();
         }
-        [HttpGet("inernalerror")]
+        [HttpGet("internalerror")]
         public IActionResult GetInternalError()
         {
             throw new Exception("This is a server error");

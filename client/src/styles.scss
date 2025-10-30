@@ -48,3 +48,18 @@ html {
 }
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+.snack-error{
+  @include mat.snack-bar-overrides((
+    button-color: white,
+    container-color: darkred,
+    supporting-text-color:white
+  ));
+}
+.snack-success{
+  @include mat.snack-bar-overrides((
+    button-color: white,
+    container-color: green,
+    supporting-text-color:white
+  ));
+}

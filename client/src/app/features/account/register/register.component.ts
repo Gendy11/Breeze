@@ -42,8 +42,7 @@ export class RegisterComponent {
         this.router.navigateByUrl('/account/login');
       },
       error:errors =>{
-        this.validationErrors = errors;
-        
+        this.validationErrors = errors
       }
     })
   }
