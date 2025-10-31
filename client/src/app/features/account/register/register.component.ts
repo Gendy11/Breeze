@@ -1,12 +1,13 @@
 import { Component, inject } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
 import { MatCard } from '@angular/material/card';
 import { MatIcon } from '@angular/material/icon';
-import { MatFormField, MatInput, MatLabel } from '@angular/material/input';
+import { MatError, MatFormField, MatInput, MatLabel } from '@angular/material/input';
 import { AccountService } from '../../../core/services/account.service';
 import { Router } from '@angular/router';
 import { JsonPipe } from '@angular/common';
+import { TextInputComponent } from "../../../shared/components/text-input/text-input.component";
 
 @Component({
   selector: 'app-register',
@@ -18,8 +19,10 @@ import { JsonPipe } from '@angular/common';
     MatInput,
     MatIcon,
     MatButton,
-    JsonPipe
-  ],
+    JsonPipe,
+    MatError,
+    TextInputComponent
+],
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss'
 })
@@ -31,10 +34,10 @@ export class RegisterComponent {
   validationErrors?:string[];
 
   registerForm = this.fb.group({
-    firstName:[''],
-    lastName:[''],
-    email:[''],
-    password:[''],
+    firstName:['', Validators.required],
+    lastName:['', Validators.required],
+    email:['', [Validators.required, Validators.email]],
+    password:['',Validators.required],
   });
   onSubmit(){
     this.accountService.register(this.registerForm.value).subscribe({
