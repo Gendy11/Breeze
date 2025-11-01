@@ -9,10 +9,13 @@ import { CartService } from './cart.service';
 export class InitService {
   private cartService = inject(CartService)
   private accountService = inject(AccountService)
-  init(){
-    const cartId = localStorage.getItem('cart_id')
+  init() {
+    const cartId = localStorage.getItem('cart_id');
     const cart$ = cartId ? this.cartService.getCart(cartId) : of(null);
-    return cart$;
 
+    const user$ = this.accountService.getuserInfo();
+
+    // run both requests in parallel and wait for both to complete
+    return forkJoin([user$, cart$]);
   }
 }
