@@ -19,10 +19,10 @@ namespace Core.Specifications
             ApplyPaging(specParams.PageSize * (specParams.PageIndex - 1), specParams.PageSize);
             switch (specParams.Sort)
             {
-                case "PriceAsc":
+                case "priceAsc":
                     AddOrderBy(x => x.Price);
                     break;
-                case "PriceDesc":
+                case "priceDesc":
                     AddOrderByDescending(x => x.Price);
                     break;
                 default:

@@ -4,58 +4,85 @@ import { ShopService } from '../../core/services/shop.service';
 import { ProductItemComponent } from "./product-item/product-item.component";
 import { MatDialog } from '@angular/material/dialog';
 import { FilterDialogComponent } from './filter-dialog/filter-dialog.component';
-import { MatButton } from '@angular/material/button';
+import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatCard } from '@angular/material/card';
 import { MatIcon } from '@angular/material/icon';
+import { MatMenu, MatMenuTrigger } from '@angular/material/menu';
+import { MatListOption, MatSelectionList, MatSelectionListChange } from '@angular/material/list';
+import { ShopParams } from '../../shared/models/shopParams';
+import {MatPaginator, PageEvent} from '@angular/material/paginator'
+import { Pagination } from '../../shared/models/pagination';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-shop',
-  imports: [ProductItemComponent, MatButton,MatCard,MatIcon],
+  imports: [ProductItemComponent, MatButton, MatCard, MatIcon, MatMenu, MatSelectionList, MatListOption,
+    MatMenuTrigger, MatPaginator, FormsModule, MatIconButton],
   templateUrl: './shop.component.html',
   styleUrl: './shop.component.scss'
 })
 export class ShopComponent implements OnInit {
-  products:Product[]=[];
-  selectedBrands : string[]=[];
-  selectedTypes : string[]=[];
+  products?: Pagination<Product>;
+  sortOptions = [
+    { name: 'Alphabetical', value: 'name' },
+    { name: 'Price: Low-High', value: 'priceAsc' },
+    { name: 'Price: High-Low', value: 'priceDesc' },
+  ]
+  shopParams = new ShopParams();
+  pageSizeOptions = [5,10,15,20];
   private dialogService = inject(MatDialog);
-  constructor(private shopService:ShopService){
+  constructor(private shopService: ShopService) {
   }
   ngOnInit(): void {
     this.initializeShop();
 
   }
-  initializeShop(){
+  initializeShop() {
     this.shopService.getTypes();
     this.shopService.getBrands();
-    this.shopService.getProducts().subscribe({
-      next:response=>{
-        this.products=response.data
+    this.getProducts();
+  }
+  getProducts() {
+    this.shopService.getProducts(this.shopParams).subscribe({
+      next: response => {
+        this.products = response;
         console.log(this.products);
       },
       error: error => console.log(error),
     })
   }
-  openFiltersDialog(){
+  onSearchChange(){
+    this.shopParams.pageNumber = 1;
+    this.getProducts()
+  }
+  handlePageEvent(event:PageEvent){
+    this.shopParams.pageNumber = event.pageIndex + 1;
+    this.shopParams.pageSize = event.pageSize;
+    this.getProducts();
+  }
+  onSortChange(event: MatSelectionListChange) {
+    const selectedOption = event.options[0];
+    if (selectedOption) {
+      this.shopParams.sort = selectedOption.value;
+      this.shopParams.pageNumber = 1;
+      this.getProducts()
+    }
+  }
+  openFiltersDialog() {
     const dialogRef = this.dialogService.open(FilterDialogComponent, {
-      minWidth:'500px',
-      data:{
-        selectedBrands:this.selectedBrands,
-        selectedTypes:this.selectedTypes
+      minWidth: '500px',
+      data: {
+        selectedBrands: this.shopParams.brands,
+        selectedTypes: this.shopParams.types
       }
     });
     dialogRef.afterClosed().subscribe({
       next: (result) => {
         if (result) {
-          this.selectedBrands = result.selectedBrands;
-          this.selectedTypes = result.selectedTypes;
-          this.shopService.getProducts(this.selectedBrands,this.selectedTypes).subscribe({
-            next:response=>{
-              this.products=response.data
-              console.log(this.products);
-            },
-            error: error => console.log(error),
-          });
+          this.shopParams.brands = result.selectedBrands;
+          this.shopParams.types = result.selectedTypes;
+          this.shopParams.pageNumber = 1;
+          this.getProducts();
         }
       }
     });

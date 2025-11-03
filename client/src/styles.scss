@@ -63,3 +63,6 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
     supporting-text-color:white
   ));
 }
+.match-input-height{
+  height: var(--mat-form-field-container-height) !important;
+}

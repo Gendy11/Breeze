@@ -1,1 +1,6 @@
-@import "tailwindcss";
+@import "tailwindcss" important;
+
+
+.text-primary{
+    @apply text-blue-700
+}
