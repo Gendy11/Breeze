@@ -21,7 +21,6 @@ import { MatDivider } from '@angular/material/divider';
     RouterLink,
     MatProgressBar,
     RouterLinkActive,
-    MatFabButton,
     MatBadgeModule,
     MatMenuTrigger,
     MatMenu,
