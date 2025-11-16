@@ -4,7 +4,7 @@ import { MatStepperModule } from '@angular/material/stepper';
 import { RouterLink } from "@angular/router";
 import { MatAnchor, MatButton } from "@angular/material/button";
 import { StripeService } from '../../core/services/stripe.service';
-import { StripeAddressElement, StripeAddressElementChangeEvent, StripePaymentElement, StripePaymentElementChangeEvent } from '@stripe/stripe-js';
+import { ConfirmationToken, StripeAddressElement, StripeAddressElementChangeEvent, StripePaymentElement, StripePaymentElementChangeEvent } from '@stripe/stripe-js';
 import { SnackbarService } from '../../core/services/snackbar.service';
 import { MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox';
 import { StepperSelectionEvent } from '@angular/cdk/stepper';
@@ -45,6 +45,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   completionStatus = signal<{ address: boolean, card: boolean, delivery: boolean }>({
     address: false, card: false, delivery: false
   });
+  confirmationToken?: ConfirmationToken;
 
 
   async ngOnInit() {
@@ -55,7 +56,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
 
       this.paymentElement = await this.stripeService.createPaymentElement();
       this.paymentElement.mount('#payment-element')
-      this.paymentElement.on('change',this.handlePaymentChange)
+      this.paymentElement.on('change', this.handlePaymentChange)
     } catch (error: any) {
       this.snackBar.error(error.message)
     }
@@ -75,13 +76,26 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     })
   }
 
-  handleDeliveryChange(event: boolean){
-    this.completionStatus.update(state =>{
+  handleDeliveryChange(event: boolean) {
+    this.completionStatus.update(state => {
       state.delivery = event;
       return state;
     })
   }
 
+  async getConfirmationToken() {
+    try {
+      if (Object.values(this.completionStatus()).every(status => status === true)) {
+        const result = await this.stripeService.createConfirmationToken();
+        if (result.error) throw new Error(result.error.message);
+        this.confirmationToken = result.confirmationToken;
+        console.log(this.confirmationToken);
+      }
+    } catch (error: any) {
+      this.snackBar.error(error.message);
+    }
+
+  }
 
 
   async onStepChange(event: StepperSelectionEvent) {
@@ -93,6 +107,9 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     }
     if (event.selectedIndex === 2) {
       await firstValueFrom(this.stripeService.createOrUpdatePaymentIntent());
+    }
+    if (event.selectedIndex === 3) {
+      await this.getConfirmationToken();
     }
   }
   private async getAddressFromStripeAddress(): Promise<Address | null> {
