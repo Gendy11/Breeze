@@ -10,6 +10,7 @@ import { NotFoundComponent } from './shared/components/not-found/not-found.compo
 import { ServerErrorComponent } from './shared/components/server-error/server-error.component';
 import { authGuard } from './core/guards/auth-guard';
 import { emptyCardGuard } from './core/guards/empty-card-guard';
+import { CheckoutSuccessComponent } from './features/checkout/checkout-success/checkout-success.component';
 
 export const routes: Routes = [
   { path: '', component: ShopComponent },
@@ -17,6 +18,7 @@ export const routes: Routes = [
   { path: 'shop/:id', component: ProductDetailsComponent },
   { path: 'cart', component: CartComponent },
   { path: 'checkout', component: CheckoutComponent, canActivate: [authGuard, emptyCardGuard] },
+  { path: 'checkout/success', component: CheckoutSuccessComponent, canActivate: [authGuard] },
   { path: 'account/login', component: LoginComponent },
   { path: 'account/register', component: RegisterComponent },
   { path: 'test-error', component: TestErrorComponent },
