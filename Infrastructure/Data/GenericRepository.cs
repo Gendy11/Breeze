@@ -70,11 +70,6 @@ namespace Infrastructure.Data
             _context.Set<T>().Remove(entity);
         }
 
-        public async Task<bool> SaveAllAsync()
-        {
-            return await _context.SaveChangesAsync() > 0;   
-        }
-
         public void Update(T entity)
         {
             _context.Set<T>().Attach(entity);

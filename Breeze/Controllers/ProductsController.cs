@@ -8,25 +8,19 @@ using Breeze.RequestHelpers;
 
 namespace Breeze.Controllers
 {
-    public class ProductsController : BaseApiController
+    public class ProductsController(IUnitOfWork unitOfWork) : BaseApiController
     {
-        private readonly IGenericRepository<Product> _repo;
-
-        public ProductsController(IGenericRepository<Product> repo)
-        {
-            this._repo =repo;
-        }
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Product>>> GetProducts([FromQuery]ProductSpecParams specParams)
         {
             var spec= new ProductSpecification(specParams);
-            return await CreatePagedResult(_repo,spec , specParams.PageIndex, specParams.PageSize);
+            return await CreatePagedResult(unitOfWork.Repository<Product>(),spec , specParams.PageIndex, specParams.PageSize);
         }   
 
         [HttpGet("{id:int}")]
         public async Task<ActionResult<Product>> GetProduct(int id)
         {
-            var product=await _repo.GetByIdAsync(id);
+            var product=await unitOfWork.Repository<Product>().GetByIdAsync(id);
 
             return Ok(product);
         }
@@ -35,21 +29,21 @@ namespace Breeze.Controllers
         public async Task<ActionResult<IReadOnlyList<string>>> GetProductBrands()
         {
             var spec=new BrandListSpecification();
-            return Ok(await _repo.ListAsync(spec));
+            return Ok(await unitOfWork.Repository<Product>().ListAsync(spec));
         }
 
         [HttpGet("types")]
         public async Task<ActionResult<IReadOnlyList<string>>> GetProductTypes()
         {
             var spec = new TypeListSpecification();
-            return Ok(await _repo.ListAsync(spec));
+            return Ok(await unitOfWork.Repository<Product>().ListAsync(spec));
         }
 
         [HttpPost]
         public async Task<ActionResult<Product>> CreateProduct(Product product)
         {
-            _repo.Add(product);
-            if(await _repo.SaveAllAsync())  
+            unitOfWork.Repository<Product>().Add(product);
+            if(await unitOfWork.Complete())  
             {
                 return CreatedAtAction("GetProduct", new { id = product.Id }, product);
             }
@@ -62,9 +56,9 @@ namespace Breeze.Controllers
             if (!productExists(id) || product.Id!=id) 
                 return BadRequest("Cannot update product");
 
-            _repo.Update(product);
+            unitOfWork.Repository<Product>().Update(product);
 
-            if (await _repo.SaveAllAsync())
+            if (await unitOfWork.Complete())
             {
                 return Ok();
             }
@@ -73,13 +67,12 @@ namespace Breeze.Controllers
 
         [HttpDelete("{id}")]
 
-        public async Task<ActionResult> DeleteProduct(Product product)
+        public async Task<ActionResult> DeleteProduct(int id)
         {
-            if (!productExists(product.Id))
-                return BadRequest("Cannot delete product");
-            await _repo.GetByIdAsync(product.Id);
-            _repo.Remove(product);
-            if (await _repo.SaveAllAsync())
+            var product = await unitOfWork.Repository<Product>().GetByIdAsync(id);
+            if (product == null) return NotFound();
+            unitOfWork.Repository<Product>().Remove(product);
+            if (await unitOfWork.Complete())
             {
                 return Ok();
             }
@@ -87,7 +80,7 @@ namespace Breeze.Controllers
         }
         private bool productExists(int id)
         {
-           return _repo.Exists(id);
+           return unitOfWork.Repository<Product>().Exists(id);
         }
     }
 }

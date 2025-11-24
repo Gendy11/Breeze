@@ -1,5 +1,6 @@
 ﻿using Core.Entities;
 using Core.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,6 +33,8 @@ namespace Infrastructure.Data
             {
                 query = query.Skip(specification.Skip).Take(specification.Take);
             }
+            query = specification.Includes.Aggregate(query, (current, include) => current.Include(include));
+            query = specification.IncludeStrings.Aggregate(query, (current, include) => current.Include(include));
 
 
             return query;
