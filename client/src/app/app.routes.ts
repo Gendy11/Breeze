@@ -13,14 +13,16 @@ import { emptyCardGuard } from './core/guards/empty-card-guard';
 import { CheckoutSuccessComponent } from './features/checkout/checkout-success/checkout-success.component';
 import { OrderComponent } from './features/orders/order.component';
 import { OrderDetailedComponent } from './features/orders/order-detailed/order-detailed.component';
+import { orderCompleteGuard } from './core/guards/order-complete-guard';
+import { HomeComponent } from './features/home/home.component';
 
 export const routes: Routes = [
-  { path: '', component: ShopComponent },
+  { path: '', component: HomeComponent },
   { path: 'shop', component: ShopComponent },
   { path: 'shop/:id', component: ProductDetailsComponent },
   { path: 'cart', component: CartComponent },
   { path: 'checkout', component: CheckoutComponent, canActivate: [authGuard, emptyCardGuard] },
-  { path: 'checkout/success', component: CheckoutSuccessComponent, canActivate: [authGuard] },
+  { path: 'checkout/success', component: CheckoutSuccessComponent, canActivate: [authGuard, orderCompleteGuard] },
   { path: 'orders', component: OrderComponent, canActivate: [authGuard] },
   { path: 'orders/:id', component: OrderDetailedComponent, canActivate: [authGuard] },
   { path: 'account/login', component: LoginComponent },

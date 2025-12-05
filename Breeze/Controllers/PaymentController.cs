@@ -81,7 +81,7 @@ namespace Breeze.Controllers
                 var connectionId = NotificationHub.GetConnectionIdByEmail(order.BuyerEmail);
                 if (!string.IsNullOrEmpty(connectionId))
                 {
-                    await hubContext.Clients.Client(connectionId).SendAsync("Order complete notification", order.ToDto());
+                    await hubContext.Clients.Client(connectionId).SendAsync("OrderCompleteNotification", order.ToDto());
                 }
             }
         }

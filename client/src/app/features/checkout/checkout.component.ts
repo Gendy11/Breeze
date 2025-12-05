@@ -32,7 +32,6 @@ import { OrderService } from '../../core/services/order.service';
     CheckoutDeliveryComponent,
     CheckoutReviewComponent,
     CurrencyPipe,
-    JsonPipe,
     MatProgressSpinnerModule
   ],
   templateUrl: './checkout.component.html',
@@ -125,11 +124,13 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     try{
       if(this.confirmationToken){
         const result = await this.stripeService.confirmPayment(this.confirmationToken);
+        console.log('res',result)
 
         if(result.paymentIntent?.status === 'succeeded'){
           const order = await this.createOrderModel();
           const orderResult = await firstValueFrom(this.orderService.createOrder(order));
           if(orderResult){
+            this.orderService.orderComplete = true;
             this.cartService.deletCart();
             this.cartService.selectedDelivery.set(null);
             this.router.navigateByUrl('/checkout/success');
