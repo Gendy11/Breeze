@@ -18,6 +18,7 @@ import { CurrencyPipe, JsonPipe } from '@angular/common';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { OrderToCreate, ShippingAddress } from '../../shared/models/order';
 import { OrderService } from '../../core/services/order.service';
+import { MatRadioButton, MatRadioGroup } from "@angular/material/radio";
 
 @Component({
   selector: 'app-checkout',
@@ -32,7 +33,9 @@ import { OrderService } from '../../core/services/order.service';
     CheckoutDeliveryComponent,
     CheckoutReviewComponent,
     CurrencyPipe,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatRadioButton,
+    MatRadioGroup
   ],
   templateUrl: './checkout.component.html',
   styleUrl: './checkout.component.scss'
@@ -54,12 +57,13 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   loading = false;
 
 
+
   async ngOnInit() {
     try {
       this.addressElement = await this.stripeService.createAddressElement();
       this.addressElement.mount('#address-element');
       this.addressElement.on('change', this.handleAddressChange)
-
+      
       this.paymentElement = await this.stripeService.createPaymentElement();
       this.paymentElement.mount('#payment-element')
       this.paymentElement.on('change', this.handlePaymentChange)
@@ -76,11 +80,13 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   }
 
   handlePaymentChange = (event: StripePaymentElementChangeEvent) => {
+    if (this.cartService.selectedPaymentMethod() !== 'card') return;
     this.completionStatus.update(state => {
       state.card = event.complete;
       return state;
     })
   }
+
 
   handleDeliveryChange(event: boolean) {
     this.completionStatus.update(state => {
@@ -119,60 +125,96 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     }
   }
 
-  async confirmPayment(stepper:MatStepper){
+  async confirmPayment(stepper: MatStepper) {
     this.loading = true;
-    try{
-      if(this.confirmationToken){
-        const result = await this.stripeService.confirmPayment(this.confirmationToken);
-        console.log('res',result)
+    try {
+      if (this.cartService.selectedPaymentMethod() === 'cod') {
+        const order = await this.createOrderModel();
+        const result = await firstValueFrom(this.orderService.createOrder(order));
 
-        if(result.paymentIntent?.status === 'succeeded'){
+        if (result) {
+          this.orderService.orderComplete = true;
+          this.cartService.deletCart();
+          this.cartService.selectedDelivery.set(null);
+          this.router.navigateByUrl('/checkout/success');
+        }
+        return;
+      }
+      if (this.confirmationToken) {
+        const result = await this.stripeService.confirmPayment(this.confirmationToken);
+        if (result.paymentIntent?.status === 'succeeded') {
           const order = await this.createOrderModel();
           const orderResult = await firstValueFrom(this.orderService.createOrder(order));
-          if(orderResult){
+          if (orderResult) {
             this.orderService.orderComplete = true;
             this.cartService.deletCart();
             this.cartService.selectedDelivery.set(null);
             this.router.navigateByUrl('/checkout/success');
-          }else{
+          } else {
             throw new Error('Order creation failed');
           }
-        }else if(result.error){
+        } else if (result.error) {
           throw new Error(result.error.message);
-        }else{
+        } else {
           throw new Error('Something went wrong');
         }
       }
-    }catch(error:any){
+    } catch (error: any) {
       this.snackBar.error(error.message || 'Something went wrong');
       stepper.previous();
-    } finally{
-      this.loading=false;
+    } finally {
+      this.loading = false;
     }
   }
 
-  private async createOrderModel():Promise<OrderToCreate>{
+
+  private async createOrderModel(): Promise<OrderToCreate> {
     const cart = this.cartService.cart();
     const shippingAddress = await this.getAddressFromStripeAddress() as ShippingAddress;
+
+    if (!cart?.id || !cart?.deliveryMethodId || !shippingAddress) {
+      throw new Error('Problem creating order');
+    }
+
+    // ------------------------
+    // CASE 1: CASH ON DELIVERY
+    // ------------------------
+    if (this.cartService.selectedPaymentMethod() === 'cod') {
+      return {
+        cartId: cart.id,
+        paymentSummary: {
+          last4: 0,
+          brand: 'COD',
+          expMonth: 0,
+          expYear: 0
+        },
+        deliveryMethodId: cart.deliveryMethodId,
+        shippingAddress: shippingAddress
+      };
+    }
+
+    // ------------------------
+    // CASE 2: STRIPE CARD PAYMENT
+    // ------------------------
     const card = this.confirmationToken?.payment_method_preview.card;
 
-    if(!cart?.id || !cart?.deliveryMethodId || !card || !shippingAddress){
-      throw new Error('Problem creating order');
+    if (!card) {
+      throw new Error('Payment information missing');
     }
 
     return {
       cartId: cart.id,
-      paymentSummary:{
+      paymentSummary: {
         last4: +card.last4,
         brand: card.brand,
         expMonth: card.exp_month,
         expYear: card.exp_year
       },
-      deliveryMethodId:cart.deliveryMethodId,
-      shippingAddress:shippingAddress
+      deliveryMethodId: cart.deliveryMethodId,
+      shippingAddress: shippingAddress
     };
-
   }
+
 
 
   private async getAddressFromStripeAddress(): Promise<Address | ShippingAddress | null> {
@@ -197,6 +239,18 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   onSaveAddressCheckboxChange(event: MatCheckboxChange) {
     this.saveAddress = event.checked
   }
+
+
+  onPaymentMethodChange(method: 'card' | 'cod') {
+    this.cartService.selectedPaymentMethod.set(method);
+
+    if (method === 'cod') {
+      this.completionStatus.update(s => ({ ...s, card: true }));
+    } else {
+      this.completionStatus.update(s => ({ ...s, card: false }));
+    }
+  }
+
 
   ngOnDestroy(): void {
     this.stripeService.disposeElements();

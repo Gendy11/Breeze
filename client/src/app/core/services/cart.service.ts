@@ -18,6 +18,7 @@ export class CartService {
     return this.cart()?.items.reduce((sum,item) => sum+item.quantity, 0)
   })
   selectedDelivery = signal<DeliveryMethod | null>(null);
+  selectedPaymentMethod = signal<'card' | 'cod'>('card');
   totals = computed(() =>{
       const cart = this.cart();
       const delivery = this.selectedDelivery();

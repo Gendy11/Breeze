@@ -1,9 +1,7 @@
 <div class="flex mt-3">
     <div class="w-3/4">
-        <mat-stepper (selectionChange)="onStepChange($event)" #stepper
-            class="bg-white border border-gray-200 shadow-sm"
-            [linear]="true"
-            >
+        <mat-stepper (selectionChange)="onStepChange($event)" #stepper class="bg-white border border-gray-200 shadow-sm"
+            [linear]="true">
             <mat-step label="Address" [completed]="completionStatus().address">
                 <div id="address-element"></div>
                 <div class="flex justify-end mt-1">
@@ -23,23 +21,46 @@
                 </div>
             </mat-step>
             <mat-step label="Payment" [completed]="completionStatus().card">
-                <div id="payment-element"></div>
+
+                <!-- Payment Method Selection -->
+                <div class="mb-4">
+                    <mat-radio-group [value]="cartService.selectedPaymentMethod()" (change)="onPaymentMethodChange($event.value)">
+
+                        <mat-radio-button value="card">Pay by card</mat-radio-button>
+                        <mat-radio-button class="ml-4" value="cod">Cash on delivery</mat-radio-button>
+                    </mat-radio-group>
+                </div>
+
+                <div [style.display]="cartService.selectedPaymentMethod() === 'card' ? 'block' : 'none'">
+                    <div id="payment-element"></div>
+                </div>
+
+
                 <div class="flex justify-between mt-6">
                     <button matStepperPrevious mat-stroked-button>Back</button>
-                    <button [disabled]="!completionStatus().card" matStepperNext mat-flat-button>Next</button>
+
+                    <button [disabled]="!completionStatus().card" matStepperNext mat-flat-button>
+                        Next
+                    </button>
                 </div>
             </mat-step>
+
             <mat-step label="Confirmation">
                 <app-checkout-review [confirmationToken]="confirmationToken"></app-checkout-review>
                 <div class="flex justify-between mt-6">
                     <button matStepperPrevious mat-stroked-button>Back</button>
-                    <button [disabled]="!confirmationToken || loading" mat-flat-button (click)="confirmPayment(stepper)">
+                    <button [disabled]="(!confirmationToken && this.cartService.selectedPaymentMethod() === 'card') || loading"
+                        mat-flat-button (click)="confirmPayment(stepper)">
                         @if(loading){
-                            <mat-spinner diameter="20"></mat-spinner>
+                        <mat-spinner diameter="20"></mat-spinner>
                         }@else{
+                            @if (this.cartService.selectedPaymentMethod() === 'card') {
                             <span>Pay {{cartService.totals()?.total| currency}}</span>
-                        }
-                </button>
+                            } @else {
+                            <span>Confirm Order</span>
+                            }
+                            }
+                    </button>
                 </div>
             </mat-step>
         </mat-stepper>
