@@ -125,7 +125,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     }
   }
 
-  async confirmPayment(stepper: MatStepper) {
+  async confirmOrder(stepper: MatStepper) {
     this.loading = true;
     try {
       if (this.cartService.selectedPaymentMethod() === 'cod') {
@@ -189,7 +189,8 @@ export class CheckoutComponent implements OnInit, OnDestroy {
           expYear: 0
         },
         deliveryMethodId: cart.deliveryMethodId,
-        shippingAddress: shippingAddress
+        shippingAddress: shippingAddress,
+        paymentMethod: 'COD'
       };
     }
 
@@ -211,7 +212,8 @@ export class CheckoutComponent implements OnInit, OnDestroy {
         expYear: card.exp_year
       },
       deliveryMethodId: cart.deliveryMethodId,
-      shippingAddress: shippingAddress
+      shippingAddress: shippingAddress,
+      paymentMethod: 'Card'
     };
   }
 

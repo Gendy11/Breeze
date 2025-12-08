@@ -52,9 +52,9 @@ namespace Breeze.Controllers
                 Subtotal = items.Sum(x => x.Price * x.Quantity),
                 PaymentSummary = orderDto.PaymentSummary,
                 PaymentIntentId = cart.PaymentIntentId,
-                BuyerEmail = email
-            };
-
+                BuyerEmail = email,
+                Status = orderDto.PaymentSummary.Brand == "COD" ? OrderStatus.Accepted : OrderStatus.Pending
+            }; 
             unitOfWork.Repository<Order>().Add(order);
             if (await unitOfWork.Complete())
             {
