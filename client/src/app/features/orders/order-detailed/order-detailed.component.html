@@ -47,7 +47,7 @@
                                 </div>
                             </td>
                             <td class="p-4">x{{item.quantity}}</td>
-                            <td class="p-4 text-right">{{item.price | currency}}</td>
+                            <td class="p-4 text-right">{{item.price | currency:'EGP ':true}}</td>
 
                         </tr>
                         }
@@ -62,7 +62,7 @@
                 <div class="space-y-4">
                     <dl class="flex items-center justify-between gap-4">
                         <dt class="font-medium text-gray-500">Subtotal</dt>
-                        <dd class="font-medium text-gray-900">{{order.subtotal| currency}} </dd>
+                        <dd class="font-medium text-gray-900">{{order.subtotal| currency:'EGP ':true}} </dd>
                     </dl>
                     <dl class="flex items-center justify-between gap-4">
                         <dt class="font-medium text-gray-500">Discount</dt>
@@ -70,12 +70,12 @@
                     </dl>
                     <dl class="flex items-center justify-between gap-4">
                         <dt class="font-medium text-gray-500">Delivery Fee</dt>
-                        <dd class="font-medium text-gray-900">{{order.shippingPrice| currency}}</dd>
+                        <dd class="font-medium text-gray-900">{{order.shippingPrice| currency:'EGP ':true}}</dd>
                     </dl>
                 </div>
                 <dl class="flex items-center justify-between gap-4 border-t border-gray-200 pt-2">
                     <dt class="font-medium text-gray-500">Total</dt>
-                    <dd class="font-medium text-gray-900">{{order.total| currency}}</dd>
+                    <dd class="font-medium text-gray-900">{{order.total| currency:'EGP ':true}}</dd>
                 </dl>
             </div>
         </div>

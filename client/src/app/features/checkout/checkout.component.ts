@@ -64,9 +64,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
       this.addressElement.mount('#address-element');
       this.addressElement.on('change', this.handleAddressChange)
       
-      this.paymentElement = await this.stripeService.createPaymentElement();
-      this.paymentElement.mount('#payment-element')
-      this.paymentElement.on('change', this.handlePaymentChange)
+
     } catch (error: any) {
       this.snackBar.error(error.message)
     }
@@ -96,6 +94,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   }
 
   async getConfirmationToken() {
+    debugger;
     try {
       if (Object.values(this.completionStatus()).every(status => status === true)) {
         const result = await this.stripeService.createConfirmationToken();
@@ -111,6 +110,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
 
 
   async onStepChange(event: StepperSelectionEvent) {
+    debugger;
     if (event.selectedIndex === 1) {
       if (this.saveAddress) {
         const address = await this.getAddressFromStripeAddress() as Address;
@@ -243,13 +243,21 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   }
 
 
-  onPaymentMethodChange(method: 'card' | 'cod') {
+  async onPaymentMethodChange(method: 'card' | 'cod') {
     this.cartService.selectedPaymentMethod.set(method);
+    debugger;
 
     if (method === 'cod') {
-      this.completionStatus.update(s => ({ ...s, card: true }));
-    } else {
       this.completionStatus.update(s => ({ ...s, card: false }));
+      this.paymentElement?.unmount();
+      this.paymentElement = undefined;
+
+
+    } else {
+      this.paymentElement = await this.stripeService.createPaymentElement();
+      this.paymentElement.mount('#payment-element')
+      this.paymentElement.on('change', this.handlePaymentChange)
+
     }
   }
 
