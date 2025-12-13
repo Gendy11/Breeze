@@ -19,6 +19,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { OrderToCreate, ShippingAddress } from '../../shared/models/order';
 import { OrderService } from '../../core/services/order.service';
 import { MatRadioButton, MatRadioGroup } from "@angular/material/radio";
+import { SignalrService } from '../../core/services/signalr.service';
 
 @Component({
   selector: 'app-checkout',
@@ -45,6 +46,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   private snackBar = inject(SnackbarService);
   private accountService = inject(AccountService);
   private orderService = inject(OrderService);
+  private signalrService = inject(SignalrService);
   private router = inject(Router);
   cartService = inject(CartService);
   addressElement?: StripeAddressElement;
@@ -131,6 +133,8 @@ export class CheckoutComponent implements OnInit, OnDestroy {
       if (this.cartService.selectedPaymentMethod() === 'cod') {
         const order = await this.createOrderModel();
         const result = await firstValueFrom(this.orderService.createOrder(order));
+        debugger;
+        this.signalrService.orderSignal.set(result || null);
 
         if (result) {
           this.orderService.orderComplete = true;

@@ -1,9 +1,11 @@
+import { DeliveryMethod } from "./deliveryMethod"
+
 export interface Order {
   id: number
   orderDate: string
   buyerEmail: string
   shippingAddress: ShippingAddress
-  deliveryMethod: string
+  deliveryMethod: DeliveryMethod
   shippingPrice: number
   paymentSummary: PaymentSummary
   orderItems: OrderItem[]

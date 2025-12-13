@@ -21,11 +21,11 @@
             </dl>
             <dl class="flex items-center justify-between gap-4">
                 <dt class="font-normal text-gray-500">Amount</dt>
-                <dd class="font-medium text-gray-900 text-end">{{order.total | currency:'EGP ':true}}</dd>
+                <dd class="font-medium text-gray-900 text-end">{{order.subtotal + order.deliveryMethod.price| currency:'EGP ':true}}</dd>
             </dl>
         </div>
         <div class="flex items-center space-x-4">
-            <button routerLink="/order/{{order.id}}" mat-flat-button>View your order</button>
+            <button routerLink="/orders/{{order.id}}" mat-flat-button>View your order</button>
             <button routerLink="/shop" mat-stroked-button>Continue shopping</button>
         </div>
     </div>
