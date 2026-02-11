@@ -53,7 +53,8 @@ namespace Breeze.Controllers
                 user.FirstName,
                 user.LastName,
                 user.Email,
-                user.Address
+                user.Address,
+                Roles = User.FindFirstValue(ClaimTypes.Role)
             });
         }
         [HttpGet("auth-status")]

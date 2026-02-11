@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Core.Specifications;
 using Breeze.RequestHelpers;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Breeze.Controllers
 {
@@ -39,6 +40,7 @@ namespace Breeze.Controllers
             return Ok(await unitOfWork.Repository<Product>().ListAsync(spec));
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<Product>> CreateProduct(Product product)
         {
@@ -50,6 +52,7 @@ namespace Breeze.Controllers
             return BadRequest("Problem creating product");
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id:int}")]
         public async Task<ActionResult> UpdateProduct(int id, Product product)
         {
@@ -65,6 +68,7 @@ namespace Breeze.Controllers
             return BadRequest("Problem updating product");
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
 
         public async Task<ActionResult> DeleteProduct(int id)
