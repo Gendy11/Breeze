@@ -26,7 +26,7 @@ namespace Core.Specifications
             AddInclude("DeliveryMethod");
         }
         public OrderSpecification(OrderSpecParams specParams) : base(x =>
-        string.IsNullOrEmpty(specParams.Status) || x.Status == ParseStatus(specParams.Status)
+        string.IsNullOrEmpty(specParams.Status) || specParams.Status == "All" || x.Status == ParseStatus(specParams.Status)
         )
         {
             AddInclude("OrderItems");

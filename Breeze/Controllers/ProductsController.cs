@@ -6,6 +6,8 @@ using Microsoft.EntityFrameworkCore;
 using Core.Specifications;
 using Breeze.RequestHelpers;
 using Microsoft.AspNetCore.Authorization;
+using Breeze.DTOs;
+using Breeze.Extensions;
 
 namespace Breeze.Controllers
 {
@@ -42,8 +44,9 @@ namespace Breeze.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<ActionResult<Product>> CreateProduct(Product product)
+        public async Task<ActionResult<Product>> CreateProduct(CreateProductDto productDto)
         {
+            var product = productDto.toEntity(); 
             unitOfWork.Repository<Product>().Add(product);
             if(await unitOfWork.Complete())  
             {

@@ -17,7 +17,7 @@ import { EmptyStateComponent } from "../../shared/components/empty-state/empty-s
 
 @Component({
   selector: 'app-shop',
-  imports: [ProductItemComponent, MatButton, MatCard, MatIcon, MatMenu, MatSelectionList, MatListOption,
+  imports: [ProductItemComponent, MatButton, MatIcon, MatMenu, MatSelectionList, MatListOption,
     MatMenuTrigger, MatPaginator, FormsModule, MatIconButton, EmptyStateComponent],
   templateUrl: './shop.component.html',
   styleUrl: './shop.component.scss'

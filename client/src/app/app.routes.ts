@@ -15,6 +15,8 @@ import { OrderComponent } from './features/orders/order.component';
 import { OrderDetailedComponent } from './features/orders/order-detailed/order-detailed.component';
 import { orderCompleteGuard } from './core/guards/order-complete-guard';
 import { HomeComponent } from './features/home/home.component';
+import { AdminComponent } from './features/admin.component';
+import { adminGuard } from './core/guards/admin-guard';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -27,9 +29,10 @@ export const routes: Routes = [
   { path: 'orders/:id', component: OrderDetailedComponent, canActivate: [authGuard] },
   { path: 'account/login', component: LoginComponent },
   { path: 'account/register', component: RegisterComponent },
-  { path: 'test-error', component: TestErrorComponent },
+  { path: 'test-error', component: TestErrorComponent, canActivate: [adminGuard] },
   { path: 'not-found', component: NotFoundComponent },
   { path: 'server-error', component: ServerErrorComponent },
+  { path: 'admin', component: AdminComponent , canActivate: [authGuard, adminGuard]},
   { path: '**', redirectTo: 'not-found', pathMatch: 'full' }
 
 ];
