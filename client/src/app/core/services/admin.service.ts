@@ -3,7 +3,8 @@ import { environment } from '../../../environments/environment.development';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { OrderParams } from '../../shared/models/orderParams';
 import { Pagination } from '../../shared/models/pagination';
-import { Order } from '../../shared/models/order';
+import { Order, OrderToCreate } from '../../shared/models/order';
+import { Product, ProductToCreate } from '../../shared/models/product';
 
 @Injectable({
   providedIn: 'root'
@@ -26,5 +27,16 @@ export class AdminService {
   }
   refundOrder(id: number){
     return this.http.post<Order>(this.baseUrl + 'admin/orders/refund/' + id, {});  
+  }
+
+
+  addProduct(productToCreate: ProductToCreate){
+    return this.http.post<Product>(this.baseUrl + 'products', productToCreate);
+  }
+  updateProduct(id: number, productToUpdate: ProductToCreate){
+    return this.http.put(this.baseUrl + 'products/' + id, productToUpdate);
+  }
+  deleteProduct(id: number){
+      return this.http.delete(this.baseUrl + 'products/' + id);
   }
 }

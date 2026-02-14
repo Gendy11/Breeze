@@ -1,0 +1,29 @@
+    <a mat-icon-button routerLink="/admin" class="mt-2">
+        <mat-icon>arrow_back</mat-icon>
+    </a>
+<mat-card class="max-w-2xl mx-left mt-5 p-8 bg-white relative">
+    <form [formGroup]="productForm" (ngSubmit)="onSubmit()">
+        <div class="text-left mb-10">
+            @if(!product && busyService.loading === false){
+                <h1 class="text-3xl font-semibold primary">Add New Product</h1>    
+            }
+            @else {
+                <h1 class="text-3xl font-semibold primary">Edit Product</h1>
+            }
+        </div>
+        <app-text-input label="Product name" formControlName="name" />
+        <app-text-input label="Product description" formControlName="description" />
+        <div class="grid grid-cols-2 gap-4 mb-4">
+            <app-text-input label="Product type" formControlName="type" />
+            <app-text-input label="Product brand" formControlName="brand" />
+        </div>
+        <div class="grid grid-cols-2 gap-4 mb-4">
+            <app-text-input label="Price" formControlName="price" type="number" />
+            <app-text-input label="Quantity in stock" formControlName="quantityInStock" type="number" />
+        </div>
+        <app-text-input label="Picture URL" formControlName="pictureUrl"/>
+        <button mat-flat-button color="primary" class="w-full py-2" type="submit" [disabled]="productForm.invalid">
+            {{product ? 'Update product' : 'Add product'}}
+        </button>
+    </form>
+</mat-card>

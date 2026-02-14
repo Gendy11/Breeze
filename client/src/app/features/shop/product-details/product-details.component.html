@@ -15,7 +15,8 @@
                         </p>
                     </div>
                     <div class="flex gap-4 mt-6">
-                        <button [disabled]="quantity == quantityInCart" mat-flat-button class="match-input-height" style="height: 56px !important;" 
+                        <button [disabled]="quantity == quantityInCart || product.quantityInStock === 0 || 
+                        quantity > product.quantityInStock || quantityInCart >= product.quantityInStock" mat-flat-button class="match-input-height" style="height: 56px !important;" 
                         (click)="updateCart()">
                             <mat-icon>shopping_cart</mat-icon>
                             {{getButtonText()}}
@@ -28,6 +29,13 @@
                     <mat-divider></mat-divider>
                     <p class="mt-6 text-gray-500">
                         {{product.description}}
+                    </p>
+                    <p class="mt-10 font-semibold">
+                        @if(product.quantityInStock > 0){
+                            There are only {{product.quantityInStock}} items left in stock, hurry up!
+                        }@else {
+                            Item out of stock.
+                        }
                     </p>
                 </div>
             </div>

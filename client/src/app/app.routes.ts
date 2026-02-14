@@ -20,7 +20,6 @@ export const routes: Routes = [
   { path: 'test-error', component: TestErrorComponent, canActivate: [adminGuard] },
   { path: 'not-found', component: NotFoundComponent },
   { path: 'server-error', component: ServerErrorComponent },
-  { path: 'admin', loadComponent: () => import('./features/admin.component').then(c => c.AdminComponent), 
-    canActivate: [authGuard, adminGuard]},
+  { path: 'admin', loadChildren: () => import('./features/admin/routes').then(c => c.adminRoutes)},
   { path: '**', redirectTo: 'not-found', pathMatch: 'full' }
 ];

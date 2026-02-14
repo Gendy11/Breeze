@@ -8,3 +8,13 @@ export interface Product{
   brand:string;
   quantityInStock:number
 }
+
+export interface ProductToCreate{
+  name:string;
+  description:string;
+  price:number;
+  pictureUrl:string;
+  type:string;
+  brand:string;
+  quantityInStock:number
+}

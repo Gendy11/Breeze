@@ -1,14 +1,20 @@
-@if(product){
-      <mat-card appearance="raised" routerLink="/shop/{{product.id}}" class="product-card"> 
-      <img src="{{product.pictureUrl}}" class="rounded-t-lg" alt="image of {{product.name}}" />
+@if(product(); as p){
+      <mat-card appearance="raised" routerLink="/shop/{{p.id}}" class="product-card"> 
+      <img src="{{p.pictureUrl}}" class="rounded-t-lg" alt="image of {{p.name}}" />
       <mat-card-content class="mt-2">
-        <h2 class="text-sm font-semibold">{{product.name}}</h2>
-        <p class="font-light">{{product.price | currency:'EGP ':true}}</p>
+        <h2 class="text-sm font-semibold">{{p.name}}</h2>
+        <p class="font-light">{{p.price | currency:'EGP ':true}}</p>
       </mat-card-content>
       <mat-card-actions (click)="$event.stopPropagation()">
-        <button mat-stroked-button class="w-full"  (click)="cartService.addItemToCart(product)">
-          <mat-icon>add_shopping_cart</mat-icon>
-          Add to cart
+        <button [disabled]="p.quantityInStock === 0 || quantityInCart() === p.quantityInStock" mat-stroked-button class="w-full" (click)="cartService.addItemToCart(p)">
+          @if(p.quantityInStock === 0){
+            Out of stock
+          }@else if(quantityInCart() === p.quantityInStock){
+            Max in cart
+          }@else {
+            <mat-icon>add_shopping_cart</mat-icon>
+            Add to cart
+          }
         </button>
       </mat-card-actions>
     </mat-card>

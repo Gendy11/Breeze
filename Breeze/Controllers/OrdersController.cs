@@ -1,5 +1,6 @@
 ﻿using Breeze.DTOs;
 using Breeze.Extensions;
+using Breeze.RequestHelpers;
 using Core.Entities;
 using Core.Entities.OrderAggregate;
 using Core.Interfaces;
@@ -13,6 +14,8 @@ namespace Breeze.Controllers
     public class OrdersController(ICartService cartService, IUnitOfWork unitOfWork) : BaseApiController
     {
         [HttpPost]
+        [InvalidateCache("api/products|", "api/products/")]
+
         public async Task<ActionResult<Order>> CreateOrder(CreateOrderDto orderDto)
         {
             var email = User.GetEmail();
@@ -25,8 +28,9 @@ namespace Breeze.Controllers
             foreach (var item in cart.Items)
             {
                 var productItem = await unitOfWork.Repository<Product>().GetByIdAsync(item.ProductId);
-
                 if (productItem == null) return BadRequest("Problem with the order");
+                productItem.QuantityInStock -= item.Quantity;
+                unitOfWork.Repository<Product>().Update(productItem);
                 var itemOrdered = new ProductItemOrdered
                 {
                     ProductId = item.ProductId,

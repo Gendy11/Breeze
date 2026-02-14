@@ -1,4 +1,4 @@
-﻿using Core.Entities;
+using Core.Entities;
 using Core.Interfaces;
 using Infrastructure.Data;
 using Microsoft.AspNetCore.Mvc;
@@ -44,7 +44,7 @@ namespace Breeze.Controllers
             var spec = new TypeListSpecification();
             return Ok(await unitOfWork.Repository<Product>().ListAsync(spec));
         }
-        [InvalidateCache("api/products|")]
+        [InvalidateCache("api/products|", "api/products/")]
         [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<Product>> CreateProduct(CreateProductDto productDto)
@@ -57,7 +57,7 @@ namespace Breeze.Controllers
             }
             return BadRequest("Problem creating product");
         }
-        [InvalidateCache("api/products|")]
+        [InvalidateCache("api/products|", "api/products/")]
         [Authorize(Roles = "Admin")]
         [HttpPut("{id:int}")]
         public async Task<ActionResult> UpdateProduct(int id, Product product)
@@ -73,7 +73,7 @@ namespace Breeze.Controllers
             }
             return BadRequest("Problem updating product");
         }
-        [InvalidateCache("api/products|")]
+        [InvalidateCache("api/products|", "api/products/")]
         [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteProduct(int id)

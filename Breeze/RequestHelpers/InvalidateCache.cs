@@ -1,10 +1,10 @@
-﻿using Core.Interfaces;
+using Core.Interfaces;
 using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Breeze.RequestHelpers
 {
-    [AttributeUsage(AttributeTargets.Method)]
-    public class InvalidateCache(string pattern) : Attribute, IAsyncActionFilter
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
+    public class InvalidateCache(params string[] patterns) : Attribute, IAsyncActionFilter
     {
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
@@ -12,7 +12,10 @@ namespace Breeze.RequestHelpers
             if(resultContext.Exception == null || resultContext.ExceptionHandled)
             {
                 var cacheService = context.HttpContext.RequestServices.GetRequiredService<IResponseCacheService>();
-                await cacheService.RemoveCacheByPattern(pattern);
+                foreach (var pattern in patterns)
+                {
+                    await cacheService.RemoveCacheByPattern(pattern);
+                }
             }
         }
     }
