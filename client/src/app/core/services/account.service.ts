@@ -3,12 +3,13 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { map, tap } from 'rxjs';
 import { SignalrService } from './signalr.service';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AccountService {
-  baseUrl = 'https://localhost:44376/api/';
+  baseUrl = environment.apiUrl;
   private http = inject(HttpClient);
   private signalrService = inject(SignalrService);
   currentUser = signal<User | null>(null);
