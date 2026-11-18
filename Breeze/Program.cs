@@ -16,7 +16,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddDbContext<StoreContext>(opt =>
 {
-    opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+    // Retries let the app wait for a paused (serverless/free) Azure SQL database to wake up.
+    opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
+        sql => sql.EnableRetryOnFailure(maxRetryCount: 6, maxRetryDelay: TimeSpan.FromSeconds(30), errorNumbersToAdd: null));
 });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -54,10 +56,18 @@ app.UseCors(x=>x.AllowAnyHeader().AllowAnyMethod().AllowCredentials()
     "https://localhost:4200"));
 app.UseAuthentication();
 app.UseAuthorization();
+
+// Serve the built Angular app from wwwroot (production)
+app.UseDefaultFiles();
+app.UseStaticFiles();
+
 app.MapControllers();
 app.MapGroup("api").MapIdentityApi<AppUser>(); //api/login or api/register
 
 app.MapHub<NotificationHub>("/hub/notifications");
+
+// Any other route (e.g. /shop/3) is an Angular route: return index.html
+app.MapFallbackToFile("index.html");
 
 try
 {
@@ -66,7 +76,7 @@ try
     var context = services.GetRequiredService<StoreContext>();
     var userManager = services.GetRequiredService<UserManager<AppUser>>();
     await context.Database.MigrateAsync();
-    await StoreContextSeed.SeedAsync(context, userManager);
+    await StoreContextSeed.SeedAsync(context, userManager, builder.Configuration["AdminPassword"]);
 }
 catch(Exception ex)
 {

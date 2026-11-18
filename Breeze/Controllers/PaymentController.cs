@@ -90,7 +90,7 @@ namespace Breeze.Controllers
         {
             try
             {
-                return EventUtility.ConstructEvent(json, Request.Headers["Stripe-Signature"], _whSecret);
+                return EventUtility.ConstructEvent(json, Request.Headers["Stripe-Signature"], _whSecret, throwOnApiVersionMismatch: false);
             }
             catch (Exception ex)
             {
