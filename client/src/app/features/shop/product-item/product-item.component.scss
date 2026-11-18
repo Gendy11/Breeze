@@ -150,6 +150,42 @@
   font-weight: 600;
 }
 
+/* Phones: two cards per row, so everything scales down a notch */
+@media (max-width: 640px) {
+  .card-media {
+    border-radius: 1.15rem;
+    img { padding: 7%; }
+  }
+
+  .badge,
+  .in-bag {
+    top: 0.55rem;
+    padding: 0.22rem 0.5rem;
+    font-size: 0.66rem;
+  }
+  .badge { left: 0.55rem; }
+  .in-bag { right: 0.55rem; }
+  .in-bag-label { display: none; }
+
+  .add-btn {
+    right: 0.55rem;
+    bottom: 0.55rem;
+    height: 2.35rem;
+    max-width: 2.35rem;
+    padding: 0 0.58rem;
+
+    /* No hover on touch: only expand for the "Added" confirmation */
+    &:hover:not(:disabled):not(.added) { max-width: 2.35rem; transform: none; .add-label { opacity: 0; } }
+    &.added { max-width: 9rem; }
+  }
+  .card:hover .media-wrap { transform: none; }
+
+  .card-body { padding: 0.7rem 0.15rem 0; gap: 0.15rem; }
+  .brand { font-size: 0.62rem; letter-spacing: 0.14em; }
+  .name { font-size: 1rem; line-height: 1.25; }
+  .price { font-size: 0.9rem; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; }
 }

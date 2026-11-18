@@ -70,6 +70,13 @@ export class ProductDetailsComponent implements OnInit {
     this.notFound.set(false);
     this.shopService.getProduct(id).subscribe({
       next: product => {
+        if (!product) {
+          // API answered with no product (deleted / unknown id)
+          this.product.set(null);
+          this.loading.set(false);
+          this.notFound.set(true);
+          return;
+        }
         this.product.set(product);
         this.quantity.set(this.quantityInCart() || 1);
         this.loading.set(false);

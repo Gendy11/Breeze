@@ -48,6 +48,7 @@
 
 .search-icon {
   position: absolute;
+  z-index: 1; // the input's backdrop-filter would otherwise paint over it
   left: 1.1rem;
   color: #64748b;
   pointer-events: none;
@@ -250,7 +251,38 @@
 }
 
 @media (max-width: 640px) {
-  .toolbar { flex-direction: column; align-items: stretch; }
+  .search {
+    max-width: none;
+    input { height: 3.1rem; font-size: 1rem; } // 16px stops iOS zooming into the field
+  }
+
+  /* Chips scroll edge-to-edge; sort stays pinned on the right */
+  .toolbar { gap: 0.5rem; margin: 1.25rem 0 1.5rem; }
+  .chips {
+    flex: 1;
+    min-width: 0;
+    margin-left: -0.75rem;
+    padding-left: 0.75rem;
+    mask-image: linear-gradient(90deg, transparent, #000 0.75rem, #000 85%, transparent);
+  }
+  .chip { padding: 0.5rem 0.9rem; font-size: 0.82rem; }
+  .sort-btn { padding: 0.5rem 0.55rem 0.5rem 0.7rem; }
+  .text-btn { padding: 0.5rem; font-size: 0; gap: 0; mat-icon { font-size: 1.2rem; } }
+
+  .grid-products {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.75rem 0.75rem;
+  }
+  .skeleton .sk-media { border-radius: 1.15rem; }
+
+  .pager {
+    margin-top: 2.5rem;
+    mat-paginator { border-radius: 1.25rem; padding: 0 0.25rem; }
+    ::ng-deep .mat-mdc-paginator-page-size { display: none; }
+    ::ng-deep .mat-mdc-paginator-range-actions { justify-content: center; }
+  }
+
+  .empty { padding: 3.5rem 0.5rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {

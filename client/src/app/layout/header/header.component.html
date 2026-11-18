@@ -27,8 +27,8 @@
           <mat-icon class="caret">expand_more</mat-icon>
         </button>
       } @else {
-        <a routerLink="/account/login" class="pill pill-ghost">Log in</a>
-        <a routerLink="/account/register" class="pill pill-solid">Sign up</a>
+        <a routerLink="/account/login" class="pill pill-ghost login-pill">Log in</a>
+        <a routerLink="/account/register" class="pill pill-solid signup-pill">Sign up</a>
       }
     </div>
   </div>
@@ -37,6 +37,37 @@
     <mat-progress-bar class="loader" mode="indeterminate"></mat-progress-bar>
   }
 </header>
+
+<!-- Phones: floating bottom dock replaces the top nav -->
+<nav class="dock" aria-label="Main (mobile)">
+  <a routerLink="/" routerLinkActive="on" [routerLinkActiveOptions]="{ exact: true }">
+    <span class="dock-icon"><mat-icon>home</mat-icon></span><span>Home</span>
+  </a>
+  <a routerLink="/shop" routerLinkActive="on">
+    <span class="dock-icon"><mat-icon>storefront</mat-icon></span><span>Shop</span>
+  </a>
+  <a routerLink="/cart" routerLinkActive="on" [attr.aria-label]="'Bag, ' + (cartService.itemCount() ?? 0) + ' items'">
+    <span class="dock-icon">
+      <mat-icon>shopping_bag</mat-icon>
+      @if (cartService.itemCount()) {
+        <b class="dock-badge">{{ cartService.itemCount() }}</b>
+      }
+    </span>
+    <span>Bag</span>
+  </a>
+  @if (accountService.currentUser()) {
+    <a routerLink="/orders" routerLinkActive="on">
+      <span class="dock-icon"><mat-icon>receipt_long</mat-icon></span><span>Orders</span>
+    </a>
+  } @else {
+    <a routerLink="/account/login" [class.on]="url().startsWith('/account')">
+      <span class="dock-icon"><mat-icon>person</mat-icon></span><span>Account</span>
+    </a>
+  }
+  <a *appIsAdmin routerLink="/admin" routerLinkActive="on">
+    <span class="dock-icon"><mat-icon>dashboard</mat-icon></span><span>Admin</span>
+  </a>
+</nav>
 
 <mat-menu #menu="matMenu" xPosition="before" class="breeze-menu">
   <button mat-menu-item routerLink="/cart">

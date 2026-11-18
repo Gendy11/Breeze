@@ -26,6 +26,8 @@ namespace Breeze.Controllers
         {
             var product=await unitOfWork.Repository<Product>().GetByIdAsync(id);
 
+            if (product == null) return NotFound();
+
             return Ok(product);
         }
 

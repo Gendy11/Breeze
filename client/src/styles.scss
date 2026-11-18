@@ -48,7 +48,23 @@ html {
   border-right-style:none !important
 }
 html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; -webkit-tap-highlight-color: transparent; }
+
+/* Page container. On phones: tighter gutters, and room at the bottom for the floating nav dock. */
+.page {
+  display: block;
+  margin: 1.5rem auto 0;
+  padding: 1.5rem;
+}
+@media (max-width: 640px) {
+  /* iOS Safari zooms into any field under 16px on focus */
+  input:not([type='checkbox']):not([type='radio']), textarea, select { font-size: 16px !important; }
+
+  .page {
+    margin-top: 0.5rem;
+    padding: 0.75rem 0.75rem calc(6.5rem + env(safe-area-inset-bottom));
+  }
+}
 
 .snack-error{
   @include mat.snack-bar-overrides((

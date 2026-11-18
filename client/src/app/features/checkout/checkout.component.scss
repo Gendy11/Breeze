@@ -74,7 +74,10 @@
     .mat-horizontal-content-container { padding: 2rem 2rem 2rem; }
 
     @media (max-width: 640px) {
-      .mat-horizontal-content-container { padding: 1.5rem 1.15rem; }
+      .mat-horizontal-stepper-header-container { padding: 0.35rem 0.5rem; }
+      .mat-horizontal-stepper-header { padding: 0 0.5rem; }
+      .mat-stepper-horizontal-line { min-width: 0.75rem; }
+      .mat-horizontal-content-container { padding: 1.35rem 1rem 1.25rem; }
       .mat-step-label { display: none; }
     }
   }
@@ -148,6 +151,36 @@
     justify-content: center;
 
     @include mat.progress-spinner-overrides((active-indicator-color: #fff));
+  }
+}
+
+/* ---------- Phones ---------- */
+@media (max-width: 640px) {
+  .secure-note { font-size: 0.78rem; padding: 0.45rem 0.85rem; }
+
+  .panel { border-radius: 1.4rem; }
+
+  .step-head {
+    gap: 0.85rem;
+    margin-bottom: 1.35rem;
+    h2 { font-size: 1.3rem; line-height: 1.2; }
+    p { font-size: 0.85rem; }
+  }
+  .step-icon { width: 2.6rem; height: 2.6rem; border-radius: 0.85rem; }
+
+  .stripe-box { padding: 0.85rem; border-radius: 1rem; }
+  .save-address { justify-content: flex-start; }
+
+  /* Full-width buttons, primary action on top (closest to the thumb) */
+  .step-actions {
+    flex-direction: column-reverse;
+    gap: 0.6rem;
+    margin-top: 1.5rem;
+    padding-top: 1.25rem;
+
+    .btn-primary,
+    .btn-ghost { justify-content: center; width: 100%; }
+    .btn-ghost { border-color: transparent; background: transparent; }
   }
 }
 
