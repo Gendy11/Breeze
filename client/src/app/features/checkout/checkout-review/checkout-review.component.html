@@ -1,34 +1,47 @@
-<div class="mt-4 w-full">
-    <h4 class="text-lg font-semibold">Billing and delivery information</h4>
-    <dl>
-        <dt class="font-medium">Shipping address</dt>
-        <dd class="mt-1 text-gray-500">{{confirmationToken?.shipping | address}}</dd>
-        <dt class="font-medium">Payment details</dt>
-        @if(cartService.selectedPaymentMethod() === 'card') {
-            <dd class="mt-1 text-gray-500">{{confirmationToken?.payment_method_preview | payment}}</dd>
-        }@else {
-            <dd class="mt-1 text-gray-500">Cash on delivery</dd>
-        }
-    </dl>
-</div>
-<div class="mt-6 mx-auto">
-    <div class="border-b border-gray-200">
-        <table class="w-full text-center">
-            <tbody class="divide-y divide-gray-200">
-                @for (item of cartService.cart()?.items; track item.productId) {
-                <tr>
-                    <td class="py-4">
-                        <div class="flex items-center gap-4">
-                            <img [src]="item.pictureUrl" alt="product image" class="w-10 h-10" />
-                            <span>{{item.productName}}</span>
-                        </div>
-                    </td>
-                    <td class="p-4">x{{item.quantity}}</td>
-                    <td class="p-4 text-right">{{item.price | currency:'EGP ':true}}</td>
+<div class="review">
+  <div class="info-grid">
+    <section class="info-card">
+      <span class="info-icon"><mat-icon>home_pin</mat-icon></span>
+      <div>
+        <h3>Shipping address</h3>
+        <p>{{ confirmationToken?.shipping | address }}</p>
+      </div>
+    </section>
 
-                </tr>
-                }
-            </tbody>
-        </table>
-    </div>
+    <section class="info-card">
+      <span class="info-icon"><mat-icon>{{ cartService.selectedPaymentMethod() === 'card' ? 'credit_card' : 'payments' }}</mat-icon></span>
+      <div>
+        <h3>Payment</h3>
+        @if (cartService.selectedPaymentMethod() === 'card') {
+          <p>{{ confirmationToken?.payment_method_preview | payment }}</p>
+        } @else {
+          <p>Cash on delivery</p>
+        }
+      </div>
+    </section>
+
+    @if (cartService.selectedDelivery(); as delivery) {
+      <section class="info-card">
+        <span class="info-icon"><mat-icon>local_shipping</mat-icon></span>
+        <div>
+          <h3>Delivery</h3>
+          <p>{{ delivery.shortName }} · {{ delivery.deliveryTime }}</p>
+        </div>
+      </section>
+    }
+  </div>
+
+  <h3 class="items-title">Items in your order</h3>
+  <ul class="items">
+    @for (item of cartService.cart()?.items; track item.productId) {
+      <li>
+        <span class="thumb"><img [src]="item.pictureUrl" [alt]="item.productName" /></span>
+        <span class="name">
+          <span class="display">{{ item.productName }}</span>
+          <span class="qty">Qty {{ item.quantity }} × {{ item.price | currency: 'EGP ' : 'symbol' : '1.0-0' }}</span>
+        </span>
+        <span class="line">{{ item.price * item.quantity | currency: 'EGP ' : 'symbol' : '1.0-0' }}</span>
+      </li>
+    }
+  </ul>
 </div>

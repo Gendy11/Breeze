@@ -1,95 +1,139 @@
-import { Component, inject, OnInit } from '@angular/core';
-import { Product } from '../../shared/models/product';
-import { ShopService } from '../../core/services/shop.service';
-import { ProductItemComponent } from "./product-item/product-item.component";
-import { MatDialog } from '@angular/material/dialog';
-import { FilterDialogComponent } from './filter-dialog/filter-dialog.component';
-import { MatButton, MatIconButton } from '@angular/material/button';
-import { MatCard } from '@angular/material/card';
-import { MatIcon } from '@angular/material/icon';
-import { MatMenu, MatMenuTrigger } from '@angular/material/menu';
-import { MatListOption, MatSelectionList, MatSelectionListChange } from '@angular/material/list';
-import { ShopParams } from '../../shared/models/shopParams';
-import {MatPaginator, PageEvent} from '@angular/material/paginator'
-import { Pagination } from '../../shared/models/pagination';
+import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import { EmptyStateComponent } from "../../shared/components/empty-state/empty-state.component";
+import { MatIcon } from '@angular/material/icon';
+import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
+import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
+import { ShopService } from '../../core/services/shop.service';
+import { Pagination } from '../../shared/models/pagination';
+import { Product } from '../../shared/models/product';
+import { ShopParams } from '../../shared/models/shopParams';
+import { ProductItemComponent } from './product-item/product-item.component';
 
 @Component({
   selector: 'app-shop',
-  imports: [ProductItemComponent, MatButton, MatIcon, MatMenu, MatSelectionList, MatListOption,
-    MatMenuTrigger, MatPaginator, FormsModule, MatIconButton, EmptyStateComponent],
+  imports: [ProductItemComponent, MatIcon, MatMenu, MatMenuItem, MatMenuTrigger, MatPaginator, FormsModule],
   templateUrl: './shop.component.html',
   styleUrl: './shop.component.scss'
 })
 export class ShopComponent implements OnInit {
-  products?: Pagination<Product>;
-  sortOptions = [
-    { name: 'Alphabetical', value: 'name' },
-    { name: 'Price: Low-High', value: 'priceAsc' },
-    { name: 'Price: High-Low', value: 'priceDesc' },
-  ]
-  shopParams = new ShopParams();
-  pageSizeOptions = [5,10,15,20];
-  private dialogService = inject(MatDialog);
-  constructor(private shopService: ShopService) {
-  }
-  ngOnInit(): void {
-    this.initializeShop();
+  shopService = inject(ShopService);
+  private destroyRef = inject(DestroyRef);
+  private searchTerms = new Subject<string>();
 
-  }
-  initializeShop() {
+  products = signal<Pagination<Product> | null>(null);
+  loading = signal(true);
+  shopParams = new ShopParams();
+
+  sortOptions = [
+    { name: 'Alphabetical', value: 'name', icon: 'sort_by_alpha' },
+    { name: 'Price: Low to High', value: 'priceAsc', icon: 'trending_up' },
+    { name: 'Price: High to Low', value: 'priceDesc', icon: 'trending_down' },
+  ];
+  pageSizeOptions = [5, 10, 15, 20];
+
+  /** Bumped whenever filters change, so templates re-read the (mutable) shopParams. */
+  private filterVersion = signal(0);
+
+  activeSortName = computed(() => {
+    this.filterVersion();
+    return this.sortOptions.find(s => s.value === this.shopParams.sort)?.name ?? 'Sort';
+  });
+
+  hasActiveFilters = computed(() => {
+    this.filterVersion();
+    const p = this.shopParams;
+    return p.brands.length > 0 || p.types.length > 0 || !!p.search;
+  });
+
+  readonly skeletons = Array.from({ length: 10 }, (_, i) => i);
+
+  ngOnInit(): void {
     this.shopService.getTypes();
     this.shopService.getBrands();
     this.getProducts();
+
+    // Live search: wait until the user pauses typing.
+    this.searchTerms.pipe(
+      debounceTime(350),
+      distinctUntilChanged(),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(() => this.applyChanges());
   }
-  resetFilters(){
-    this.shopParams = new ShopParams();
-    this.getProducts();
-  }
+
   getProducts() {
+    this.loading.set(true);
     this.shopService.getProducts(this.shopParams).subscribe({
       next: response => {
-        this.products = response;
-        console.log(this.products);
+        this.products.set(response);
+        this.loading.set(false);
       },
-      error: error => console.log(error),
-    })
+      error: () => this.loading.set(false),
+    });
   }
-  onSearchChange(){
+
+  /** Resets to page 1 and reloads after any filter/sort/search change. */
+  private applyChanges() {
     this.shopParams.pageNumber = 1;
-    this.getProducts()
+    this.filterVersion.update(v => v + 1);
+    this.getProducts();
   }
-  handlePageEvent(event:PageEvent){
+
+  onSearchInput(term: string) {
+    this.searchTerms.next(term.trim());
+  }
+
+  onSearchSubmit() {
+    this.applyChanges();
+  }
+
+  clearSearch() {
+    this.shopParams.search = '';
+    this.searchTerms.next('');
+    this.applyChanges();
+  }
+
+  isBrandSelected(brand: string) {
+    return this.shopParams.brands.includes(brand);
+  }
+
+  isTypeSelected(type: string) {
+    return this.shopParams.types.includes(type);
+  }
+
+  toggleBrand(brand: string) {
+    this.shopParams.brands = this.toggle(this.shopParams.brands, brand);
+    this.applyChanges();
+  }
+
+  toggleType(type: string) {
+    this.shopParams.types = this.toggle(this.shopParams.types, type);
+    this.applyChanges();
+  }
+
+  setSort(value: string) {
+    if (this.shopParams.sort === value) return;
+    this.shopParams.sort = value;
+    this.applyChanges();
+  }
+
+  resetFilters() {
+    const pageSize = this.shopParams.pageSize;
+    this.shopParams = new ShopParams();
+    this.shopParams.pageSize = pageSize;
+    this.searchTerms.next('');
+    this.applyChanges();
+  }
+
+  handlePageEvent(event: PageEvent) {
     this.shopParams.pageNumber = event.pageIndex + 1;
     this.shopParams.pageSize = event.pageSize;
     this.getProducts();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
-  onSortChange(event: MatSelectionListChange) {
-    const selectedOption = event.options[0];
-    if (selectedOption) {
-      this.shopParams.sort = selectedOption.value;
-      this.shopParams.pageNumber = 1;
-      this.getProducts()
-    }
-  }
-  openFiltersDialog() {
-    const dialogRef = this.dialogService.open(FilterDialogComponent, {
-      minWidth: '500px',
-      data: {
-        selectedBrands: this.shopParams.brands,
-        selectedTypes: this.shopParams.types
-      }
-    });
-    dialogRef.afterClosed().subscribe({
-      next: (result) => {
-        if (result) {
-          this.shopParams.brands = result.selectedBrands;
-          this.shopParams.types = result.selectedTypes;
-          this.shopParams.pageNumber = 1;
-          this.getProducts();
-        }
-      }
-    });
+
+  private toggle(list: string[], value: string) {
+    return list.includes(value) ? list.filter(v => v !== value) : [...list, value];
   }
 }

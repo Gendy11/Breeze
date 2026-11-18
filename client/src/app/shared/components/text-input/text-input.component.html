@@ -1,10 +1,35 @@
-<mat-form-field appearance="fill" class="w-full mb-4">
-    <mat-label>{{label}}</mat-label>
-    <input matInput placeholder={{label}} [formControl]="control" type={{type}}>
-    @if(control.hasError('required')){
-    <mat-error>{{label}} is required</mat-error>
+<div class="field" [class.invalid]="showError" [class.has-icon]="icon">
+  <label [for]="id">{{ label }}</label>
+
+  <div class="control">
+    @if (icon) { <mat-icon class="lead">{{ icon }}</mat-icon> }
+
+    <input [id]="id" [type]="inputType" [formControl]="control"
+      [placeholder]="placeholder || label"
+      [attr.autocomplete]="autocomplete || null"
+      [attr.aria-invalid]="showError"
+      [attr.aria-describedby]="showError ? id + '-error' : null" />
+
+    @if (type === 'password') {
+      <button type="button" class="toggle" (click)="showPassword.set(!showPassword())"
+        [attr.aria-label]="showPassword() ? 'Hide password' : 'Show password'">
+        <mat-icon>{{ showPassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+      </button>
     }
-    @if(control.hasError('email')){
-    <mat-error>Email is invalid</mat-error>
-    }
-</mat-form-field>
+  </div>
+
+  @if (showError) {
+    <p class="error" [id]="id + '-error'">
+      <mat-icon>error_outline</mat-icon>
+      @if (control.hasError('required')) {
+        {{ label }} is required
+      } @else if (control.hasError('email')) {
+        Enter a valid email address
+      } @else if (control.hasError('min')) {
+        {{ label }} can’t be negative
+      } @else {
+        {{ label }} is invalid
+      }
+    </p>
+  }
+</div>

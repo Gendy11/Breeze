@@ -1,8 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, inject, OnInit } from '@angular/core';
 import {MatIconModule} from '@angular/material/icon';
-import { MatButtonModule, MatFabButton } from '@angular/material/button';
-import { MatButton } from "@angular/material/button";
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { AccountService } from '../../core/services/account.service';
 import { BusyService } from '../../core/services/busy.service';
@@ -18,7 +16,6 @@ import { IsAdminDirective } from '../../shared/directives/is-admin';
   standalone: true,
   imports: [
     MatIconModule,
-    MatButton,
     RouterLink,
     MatProgressBar,
     RouterLinkActive,

@@ -1,24 +1,64 @@
-<mat-card class="max-w-lg mx-auto mt-32 p-8 bg-white">
-    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
-        <div class="text-center mb-6">
-            <h1 class="text-3xl font-semibold primary">Register</h1>
-        </div>
-        <app-text-input label="First name" formControlName="firstName" />
-        <app-text-input label="Last name" formControlName="lastName" />
-        <app-text-input label="Email" formControlName="email" />
-        <app-text-input label="Password" formControlName="password" type="password" />
-        @if(validationErrors){
-        <div class="mb-3 p-4 bg-red-100 text-red-600">
-            <ul class="list-disc px-3">
-                @for (error of validationErrors; track $index){
-                <li>{{error}}</li>
-                }
-            </ul>
-        </div>
-        }
-        <button mat-flat-button color="primary" class="w-full py-2" type="submit" [disabled]="registerForm.invalid">
-            Register
-        </button>
+<div class="px-2 sm:px-4 pb-16">
+  <div class="auth rise">
+    <!-- Visual side -->
+    <aside class="auth-visual" aria-hidden="true">
+      <div class="aurora dark">
+        <span class="blob blob-1"></span>
+        <span class="blob blob-2"></span>
+      </div>
+      <img class="auth-photo" src="/images/background.jpg" alt="" />
 
-    </form>
-</mat-card>
+      <span class="auth-logo">B</span>
+
+      <div class="relative">
+        <p class="auth-quote">Join Breeze and find the scent that <em class="shimmer light">feels like you.</em></p>
+        <ul class="auth-points">
+          <li><mat-icon>verified</mat-icon> Fragrances from designer houses</li>
+          <li><mat-icon>lock</mat-icon> Secure checkout with Stripe</li>
+          <li><mat-icon>receipt_long</mat-icon> Order history at a glance</li>
+        </ul>
+      </div>
+    </aside>
+
+    <!-- Form side -->
+    <section class="auth-form">
+      <span class="eyebrow"><span class="spark">✦</span> New here?</span>
+      <h1 class="display mt-4 text-4xl">Create your <em class="shimmer">account</em></h1>
+      <p class="mt-2 mb-8 text-slate-600">It only takes a minute.</p>
+
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" novalidate>
+        <div class="grid gap-x-4 sm:grid-cols-2">
+          <app-text-input label="First name" formControlName="firstName" icon="person" autocomplete="given-name" />
+          <app-text-input label="Last name" formControlName="lastName" autocomplete="family-name" />
+        </div>
+        <app-text-input label="Email" formControlName="email" type="email" icon="mail"
+          placeholder="you@example.com" autocomplete="email" />
+        <app-text-input label="Password" formControlName="password" type="password" icon="lock"
+          placeholder="Create a password" autocomplete="new-password" />
+
+        @if (validationErrors?.length) {
+          <div class="form-alert" role="alert">
+            <mat-icon>error_outline</mat-icon>
+            <ul>
+              @for (error of validationErrors; track $index) {
+                <li>{{ error }}</li>
+              }
+            </ul>
+          </div>
+        }
+
+        <button type="submit" class="btn-primary submit" [disabled]="registerForm.invalid || submitting()">
+          @if (submitting()) {
+            <mat-spinner diameter="20" strokeWidth="3"></mat-spinner> Creating account…
+          } @else {
+            Create account <mat-icon class="arrow">arrow_forward</mat-icon>
+          }
+        </button>
+      </form>
+
+      <p class="switch">
+        Already have an account? <a routerLink="/account/login">Log in</a>
+      </p>
+    </section>
+  </div>
+</div>

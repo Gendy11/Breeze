@@ -1,0 +1,8 @@
+@use '@angular/material' as mat;
+
+// Layout (.auth, .auth-visual, .auth-form) lives in src/brand.scss.
+:host {
+  display: block;
+  color: var(--brand-navy);
+  @include mat.progress-spinner-overrides((active-indicator-color: #fff));
+}

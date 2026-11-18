@@ -1,29 +1,63 @@
-    <a mat-icon-button routerLink="/admin" class="mt-2">
-        <mat-icon>arrow_back</mat-icon>
-    </a>
-<mat-card class="max-w-2xl mx-left mt-5 p-8 bg-white relative">
-    <form [formGroup]="productForm" (ngSubmit)="onSubmit()">
-        <div class="text-left mb-10">
-            @if(!product && busyService.loading === false){
-                <h1 class="text-3xl font-semibold primary">Add New Product</h1>    
-            }
-            @else {
-                <h1 class="text-3xl font-semibold primary">Edit Product</h1>
-            }
-        </div>
-        <app-text-input label="Product name" formControlName="name" />
-        <app-text-input label="Product description" formControlName="description" />
-        <div class="grid grid-cols-2 gap-4 mb-4">
-            <app-text-input label="Product type" formControlName="type" />
-            <app-text-input label="Product brand" formControlName="brand" />
-        </div>
-        <div class="grid grid-cols-2 gap-4 mb-4">
-            <app-text-input label="Price" formControlName="price" type="number" />
-            <app-text-input label="Quantity in stock" formControlName="quantityInStock" type="number" />
-        </div>
-        <app-text-input label="Picture URL" formControlName="pictureUrl"/>
-        <button mat-flat-button color="primary" class="w-full py-2" type="submit" [disabled]="productForm.invalid">
-            {{product ? 'Update product' : 'Add product'}}
+<div class="max-w-screen-xl mx-auto px-2 sm:px-4 pb-16">
+  <a routerLink="/admin" class="back rise"><mat-icon>arrow_back</mat-icon> Back to dashboard</a>
+
+  <header class="mt-6 mb-8 rise" style="--d: 60ms">
+    <span class="eyebrow"><span class="spark">✦</span> Product catalog</span>
+    <h1 class="display mt-4 text-4xl sm:text-5xl">
+      @if (product || busyService.loading) {
+        Edit <em class="shimmer">product</em>
+      } @else {
+        Add a new <em class="shimmer">product</em>
+      }
+    </h1>
+  </header>
+
+  <div class="grid items-start gap-8 lg:grid-cols-[1fr_20rem] xl:gap-12">
+    <!-- Form -->
+    <form class="panel rise" style="--d: 120ms" [formGroup]="productForm" (ngSubmit)="onSubmit()" novalidate>
+      <h2 class="section-title"><mat-icon>badge</mat-icon> Details</h2>
+      <app-text-input label="Product name" formControlName="name" placeholder="e.g. Sauvage Elixir" />
+      <app-text-input label="Product description" formControlName="description" placeholder="Describe the scent" />
+      <div class="grid gap-x-4 sm:grid-cols-2">
+        <app-text-input label="Product type" formControlName="type" icon="category" placeholder="e.g. Perfumes" />
+        <app-text-input label="Product brand" formControlName="brand" icon="sell" placeholder="e.g. Dior" />
+      </div>
+
+      <h2 class="section-title mt-4"><mat-icon>payments</mat-icon> Pricing & stock</h2>
+      <div class="grid gap-x-4 sm:grid-cols-2">
+        <app-text-input label="Price" formControlName="price" type="number" icon="attach_money" placeholder="0" />
+        <app-text-input label="Quantity in stock" formControlName="quantityInStock" type="number" icon="inventory_2" placeholder="0" />
+      </div>
+
+      <h2 class="section-title mt-4"><mat-icon>image</mat-icon> Image</h2>
+      <app-text-input label="Picture URL" formControlName="pictureUrl" icon="link" placeholder="/images/products/…" />
+
+      <div class="actions">
+        <a routerLink="/admin" class="btn-ghost">Cancel</a>
+        <button type="submit" class="btn-primary" [disabled]="productForm.invalid">
+          <mat-icon>{{ product ? 'save' : 'add' }}</mat-icon>
+          {{ product ? 'Update product' : 'Add product' }}
         </button>
+      </div>
     </form>
-</mat-card>
+
+    <!-- Live preview -->
+    <aside class="preview-col rise" style="--d: 180ms">
+      <h2 class="section-title"><mat-icon>visibility</mat-icon> Live preview</h2>
+      @let v = preview();
+      <div class="preview">
+        <div class="preview-media">
+          @if (v.pictureUrl) {
+            <img [src]="v.pictureUrl" [alt]="v.name || 'Product image'" />
+          } @else {
+            <span class="placeholder"><mat-icon>image</mat-icon> Add a picture URL</span>
+          }
+        </div>
+        <span class="brand">{{ v.brand || 'Brand' }}</span>
+        <span class="display name">{{ v.name || 'Product name' }}</span>
+        <span class="price">{{ (v.price ?? 0) | currency: 'EGP ' : 'symbol' : '1.0-0' }}</span>
+      </div>
+      <p class="hint">This is how the product will look in the shop.</p>
+    </aside>
+  </div>
+</div>

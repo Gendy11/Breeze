@@ -1,21 +1,38 @@
-@if(product(); as p){
-      <mat-card appearance="raised" routerLink="/shop/{{p.id}}" class="product-card"> 
-      <img src="{{p.pictureUrl}}" class="rounded-t-lg" alt="image of {{p.name}}" />
-      <mat-card-content class="mt-2">
-        <h2 class="text-sm font-semibold">{{p.name}}</h2>
-        <p class="font-light">{{p.price | currency:'EGP ':true}}</p>
-      </mat-card-content>
-      <mat-card-actions (click)="$event.stopPropagation()">
-        <button [disabled]="p.quantityInStock === 0 || quantityInCart() === p.quantityInStock" mat-stroked-button class="w-full" (click)="cartService.addItemToCart(p)">
-          @if(p.quantityInStock === 0){
-            Out of stock
-          }@else if(quantityInCart() === p.quantityInStock){
-            Max in cart
-          }@else {
-            <mat-icon>add_shopping_cart</mat-icon>
-            Add to cart
-          }
-        </button>
-      </mat-card-actions>
-    </mat-card>
+@if (product(); as p) {
+  <article class="card" [style.--tint]="tint()">
+    <div class="media-wrap">
+    <a [routerLink]="['/shop', p.id]" class="card-media" [attr.aria-label]="'View ' + p.name">
+      <img [src]="p.pictureUrl" [alt]="p.name" loading="lazy" />
+
+      @if (p.quantityInStock === 0) {
+        <span class="badge badge-muted">Sold out</span>
+      } @else if (p.quantityInStock <= 5) {
+        <span class="badge">Only {{ p.quantityInStock }} left</span>
+      }
+
+      @if (quantityInCart() > 0) {
+        <span class="in-bag"><mat-icon>shopping_bag</mat-icon>{{ quantityInCart() }} in bag</span>
+      }
+    </a>
+
+    <button type="button" class="add-btn" (click)="add(p)"
+      [disabled]="p.quantityInStock === 0 || quantityInCart() >= p.quantityInStock"
+      [class.added]="justAdded()"
+      [attr.aria-label]="p.quantityInStock === 0 ? 'Sold out' : quantityInCart() >= p.quantityInStock ? 'Maximum in cart' : 'Add ' + p.name + ' to cart'">
+      <mat-icon>{{ justAdded() ? 'check' : p.quantityInStock === 0 ? 'block' : 'add' }}</mat-icon>
+      <span class="add-label">
+        @if (p.quantityInStock === 0) { Sold out }
+        @else if (quantityInCart() >= p.quantityInStock) { Max in bag }
+        @else if (justAdded()) { Added }
+        @else { Add to bag }
+      </span>
+    </button>
+    </div>
+
+    <a [routerLink]="['/shop', p.id]" class="card-body">
+      <span class="brand">{{ p.brand }}</span>
+      <h2 class="display name">{{ p.name }}</h2>
+      <span class="price">{{ p.price | currency: 'EGP ' : 'symbol' : '1.0-0' }}</span>
+    </a>
+  </article>
 }

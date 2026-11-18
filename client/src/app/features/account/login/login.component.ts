@@ -1,21 +1,14 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatButton } from '@angular/material/button';
-import { MatCard } from '@angular/material/card';
-import { MatFormField, MatInput, MatLabel} from '@angular/material/input';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { MatIcon } from '@angular/material/icon';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { AccountService } from '../../../core/services/account.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { TextInputComponent } from '../../../shared/components/text-input/text-input.component';
 
 @Component({
   selector: 'app-login',
-  imports: [
-    ReactiveFormsModule,
-    MatInput,
-    MatFormField,
-    MatLabel,
-    MatCard,
-    MatButton
-  ],
+  imports: [ReactiveFormsModule, RouterLink, MatIcon, MatProgressSpinner, TextInputComponent],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
 })
@@ -24,22 +17,30 @@ export class LoginComponent {
   private accountService = inject(AccountService);
   private router = inject(Router);
   private activatedRoute = inject(ActivatedRoute);
+
   returnUrl = '/shop';
-  constructor(){
+  submitting = signal(false);
+
+  constructor() {
     const url = this.activatedRoute.snapshot.queryParams['returnUrl'];
-    if(url) this.returnUrl = url;
+    if (url) this.returnUrl = url;
   }
 
   loginForm = this.fb.group({
-    email:[''],
-    password:['']
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', Validators.required]
   });
-  onSubmit(){
+
+  onSubmit() {
+    if (this.loginForm.invalid || this.submitting()) return;
+    this.submitting.set(true);
     this.accountService.login(this.loginForm.value).subscribe({
-      next: user=>{
+      next: () => {
         this.accountService.getuserInfo().subscribe();
         this.router.navigateByUrl(this.returnUrl);
-      }
-    })
+      },
+      // The error interceptor already shows a message for failed logins.
+      error: () => this.submitting.set(false)
+    });
   }
 }

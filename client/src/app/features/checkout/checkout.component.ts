@@ -2,7 +2,7 @@ import { Component, inject, OnDestroy, OnInit, signal, Signal } from '@angular/c
 import { OrderSummaryComponent } from "../../shared/components/order-summary/order-summary.component";
 import { MatStepper, MatStepperModule } from '@angular/material/stepper';
 import { Router, RouterLink } from "@angular/router";
-import { MatAnchor, MatButton } from "@angular/material/button";
+import { MatIcon } from "@angular/material/icon";
 import { StripeService } from '../../core/services/stripe.service';
 import { ConfirmationToken, StripeAddressElement, StripeAddressElementChangeEvent, StripePaymentElement, StripePaymentElementChangeEvent } from '@stripe/stripe-js';
 import { SnackbarService } from '../../core/services/snackbar.service';
@@ -18,7 +18,7 @@ import { CurrencyPipe, JsonPipe } from '@angular/common';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { OrderToCreate, ShippingAddress } from '../../shared/models/order';
 import { OrderService } from '../../core/services/order.service';
-import { MatRadioButton, MatRadioGroup } from "@angular/material/radio";
+
 import { SignalrService } from '../../core/services/signalr.service';
 
 @Component({
@@ -27,16 +27,14 @@ import { SignalrService } from '../../core/services/signalr.service';
     OrderSummaryComponent,
     MatStepperModule,
     RouterLink,
-    MatAnchor,
-    MatButton,
+    MatIcon,
     RouterLink,
     MatCheckboxModule,
     CheckoutDeliveryComponent,
     CheckoutReviewComponent,
     CurrencyPipe,
-    MatProgressSpinnerModule,
-    MatRadioButton,
-    MatRadioGroup
+    MatProgressSpinnerModule
+
   ],
   templateUrl: './checkout.component.html',
   styleUrl: './checkout.component.scss'

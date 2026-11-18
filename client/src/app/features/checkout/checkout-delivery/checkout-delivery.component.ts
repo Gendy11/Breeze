@@ -1,6 +1,6 @@
 import { Component, inject, OnInit, output } from '@angular/core';
 import { CheckoutService } from '../../../core/services/checkout.service';
-import { MatRadioModule } from '@angular/material/radio';
+import { MatIcon } from '@angular/material/icon';
 import { CurrencyPipe } from '@angular/common';
 import { CartService } from '../../../core/services/cart.service';
 import { DeliveryMethod } from '../../../shared/models/deliveryMethod';
@@ -8,7 +8,7 @@ import { DeliveryMethod } from '../../../shared/models/deliveryMethod';
 @Component({
   selector: 'app-checkout-delivery',
   imports: [
-    MatRadioModule,
+    MatIcon,
     CurrencyPipe
   ],
   templateUrl: './checkout-delivery.component.html',
@@ -19,6 +19,9 @@ export class CheckoutDeliveryComponent implements OnInit {
   cartService = inject(CartService);
 
   deliveryComplete = output<boolean>();
+
+  /** Methods are sorted most to least expensive (fastest first). */
+  icons = ['rocket_launch', 'local_shipping', 'inventory_2', 'savings'];
 
   ngOnInit(): void {
     this.checkoutService.getDeliveryMethods().subscribe({

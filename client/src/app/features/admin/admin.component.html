@@ -1,141 +1,206 @@
-<div class="min-h-screen">
-    <mat-tab-group class="bg-white">
-        <mat-tab label="Orders">
-            <div class="flex justify-between items-center mt-2 max-w-screen-2xl mx-auto">
-                <h2 class="text-2xl font-semibold">Customer orders</h2>
-                <mat-form-field appearance="outline" class="mt-2">
-                    <mat-label>
-                        Filter by status
-                    </mat-label>
-                    <mat-select (selectionChange)="onFilterSelect($event)">
-                        @for(status of statusOptions; track $index){
-                        <mat-option [value]="status">{{status}}</mat-option>
-                        }
-                    </mat-select>
-                </mat-form-field>
-            </div>
-            <div class="p-4">
-                <table mat-table [dataSource]="dataSourceOrders" class="bg-white">
+<div class="max-w-screen-2xl mx-auto px-2 sm:px-4 pb-16">
+  <!-- ============ HEADER ============ -->
+  <section class="band relative overflow-hidden rounded-[2rem] rise">
+    <div class="aurora" aria-hidden="true">
+      <span class="blob blob-1"></span>
+      <span class="blob blob-2"></span>
+    </div>
+    <div class="relative flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
+      <div>
+        <span class="eyebrow"><span class="spark">✦</span> Admin</span>
+        <h1 class="display mt-4 text-4xl sm:text-5xl">Store <em class="shimmer">dashboard</em></h1>
+        <p class="mt-2 text-slate-600">Manage customer orders and your product catalog.</p>
+      </div>
 
-                    <ng-container matColumnDef="id">
-                        <th mat-header-cell *matHeaderCellDef> No. </th>
-                        <td mat-cell *matCellDef="let order"> {{order.id}} </td>
-                    </ng-container>
+      <div class="stats">
+        <div class="stat">
+          <span class="stat-icon"><mat-icon>receipt_long</mat-icon></span>
+          <span>
+            <span class="stat-value display">{{ totalOrders }}</span>
+            <span class="stat-label">{{ orderParams.filter ? 'Matching orders' : 'Orders' }}</span>
+          </span>
+        </div>
+        <div class="stat">
+          <span class="stat-icon aqua"><mat-icon>inventory_2</mat-icon></span>
+          <span>
+            <span class="stat-value display">{{ totalProducts }}</span>
+            <span class="stat-label">Products</span>
+          </span>
+        </div>
+        <a routerLink="product" class="stat stat-cta">
+          <span class="stat-icon light"><mat-icon>add</mat-icon></span>
+          <span class="stat-label">Add product</span>
+        </a>
+      </div>
+    </div>
+  </section>
 
-                    <ng-container matColumnDef="buyerEmail">
-                        <th mat-header-cell *matHeaderCellDef> Buyer Email </th>
-                        <td mat-cell *matCellDef="let order"> {{order.buyerEmail}} </td>
-                    </ng-container>
+  <!-- ============ TABS ============ -->
+  <mat-tab-group class="tabs rise" style="--d: 100ms" animationDuration="250ms" mat-stretch-tabs="false" mat-align-tabs="start">
+    <!-- Orders -->
+    <mat-tab>
+      <ng-template mat-tab-label><mat-icon>receipt_long</mat-icon> Orders</ng-template>
 
-                    <ng-container matColumnDef="total">
-                        <th mat-header-cell *matHeaderCellDef> Total </th>
-                        <td mat-cell *matCellDef="let order"> {{order.total | currency:'EGP ': true}} </td>
-                    </ng-container>
+      <div class="panel">
+        <div class="panel-head">
+          <h2 class="display text-2xl">Customer orders</h2>
+          <div class="chips" role="group" aria-label="Filter orders by status">
+            @for (s of statusOptions; track s.value) {
+              <button type="button" class="chip" [class.on]="orderParams.filter === s.value"
+                [attr.aria-pressed]="orderParams.filter === s.value" (click)="setFilter(s.value)">
+                {{ s.label }}
+              </button>
+            }
+          </div>
+        </div>
 
-                    <ng-container matColumnDef="orderDate">
-                        <th mat-header-cell *matHeaderCellDef> Order Date </th>
-                        <td mat-cell *matCellDef="let order"> {{order.orderDate | date: 'short'}} </td>
-                    </ng-container>
+        <div class="table-wrap">
+          <table mat-table [dataSource]="dataSourceOrders" class="table">
+            <ng-container matColumnDef="id">
+              <th mat-header-cell *matHeaderCellDef>Order</th>
+              <td mat-cell *matCellDef="let order"><span class="id">#{{ order.id }}</span></td>
+            </ng-container>
 
-                    <ng-container matColumnDef="status">
-                        <th mat-header-cell *matHeaderCellDef> Status </th>
-                        <td mat-cell *matCellDef="let order"> {{order.status}} </td>
-                    </ng-container>
+            <ng-container matColumnDef="buyerEmail">
+              <th mat-header-cell *matHeaderCellDef>Customer</th>
+              <td mat-cell *matCellDef="let order">
+                <span class="customer">
+                  <span class="avatar">{{ order.buyerEmail.charAt(0).toUpperCase() }}</span>
+                  {{ order.buyerEmail }}
+                </span>
+              </td>
+            </ng-container>
 
-                    <ng-container matColumnDef="action">
-                        <th mat-header-cell *matHeaderCellDef> Actions </th>
-                        <td mat-cell *matCellDef="let order">
-                            <div class="flex gap-2">
-                                <button mat-icon-button routerLink="/orders/{{order.id}}" [matTooltip]="'View'">
-                                    <mat-icon class="text-blue-500">visibility</mat-icon>
-                                </button>
-                                @if(order.status!= 'Refunded'){
-                                <button mat-icon-button [matTooltip]="'Refund'"
-                                    (click)="openOrderConfirmDialog(order.id)">
-                                    <mat-icon class="text-red-500">undo</mat-icon>
-                                </button>
-                                }
-                            </div>
+            <ng-container matColumnDef="orderDate">
+              <th mat-header-cell *matHeaderCellDef>Date</th>
+              <td mat-cell *matCellDef="let order" class="muted">{{ order.orderDate | date: 'medium' }}</td>
+            </ng-container>
 
-                        </td>
-                    </ng-container>
+            <ng-container matColumnDef="total">
+              <th mat-header-cell *matHeaderCellDef>Total</th>
+              <td mat-cell *matCellDef="let order" class="num">{{ order.total | currency: 'EGP ' : 'symbol' : '1.0-0' }}</td>
+            </ng-container>
 
-                    <tr mat-header-row *matHeaderRowDef="displayedOrderColumns"></tr>
-                    <tr mat-row *matRowDef="let row; columns: displayedOrderColumns;"></tr>
-                </table>
-                <mat-paginator class="bg-white" [pageSizeOptions]="[5,10,15]" [length]="totalOrders"
-                    [pageSize]="orderParams.pageSize" (page)="onOrderPageChange($event)" showFirstLastButtons>
-                </mat-paginator>
+            <ng-container matColumnDef="status">
+              <th mat-header-cell *matHeaderCellDef>Status</th>
+              <td mat-cell *matCellDef="let order"><app-order-status [status]="order.status"></app-order-status></td>
+            </ng-container>
 
-            </div>
-        </mat-tab>
-        <mat-tab label="Product Catalog">
-            <div class="flex justify-between items-center mt-2 max-w-screen-2xl mx-auto">
-                <h2 class="text-2xl font-semibold">Product Catalog</h2>
-                <button mat-flat-button routerLink="product">
-                    <mat-icon>add</mat-icon>
-                    Add new product
-                </button>
-            </div>
-            <div class="p-4">
-                <table mat-table [dataSource]="dataSourceProducts" class="bg-white">
+            <ng-container matColumnDef="action">
+              <th mat-header-cell *matHeaderCellDef class="right">Actions</th>
+              <td mat-cell *matCellDef="let order" class="right">
+                <span class="actions">
+                  <a class="icon-btn" [routerLink]="['/orders', order.id]" matTooltip="View order" [attr.aria-label]="'View order ' + order.id">
+                    <mat-icon>visibility</mat-icon>
+                  </a>
+                  @if (order.status !== 'Refunded') {
+                    <button type="button" class="icon-btn danger" matTooltip="Refund" (click)="openOrderConfirmDialog(order.id)"
+                      [attr.aria-label]="'Refund order ' + order.id">
+                      <mat-icon>undo</mat-icon>
+                    </button>
+                  }
+                </span>
+              </td>
+            </ng-container>
 
-                    <ng-container matColumnDef="id">
-                        <th mat-header-cell *matHeaderCellDef> No. </th>
-                        <td mat-cell *matCellDef="let product"> {{product.id}} </td>
-                    </ng-container>
+            <tr mat-header-row *matHeaderRowDef="displayedOrderColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedOrderColumns"></tr>
+            <tr class="mat-row" *matNoDataRow>
+              <td class="empty-cell" [attr.colspan]="displayedOrderColumns.length">
+                <mat-icon>inbox</mat-icon> No orders match this filter
+              </td>
+            </tr>
+          </table>
+        </div>
 
-                    <ng-container matColumnDef="name">
-                        <th mat-header-cell *matHeaderCellDef> Name </th>
-                        <td mat-cell *matCellDef="let product"> {{product.name}} </td>
-                    </ng-container>
+        <mat-paginator class="pager" [pageSizeOptions]="[5, 10, 15]" [length]="totalOrders"
+          [pageSize]="orderParams.pageSize" [pageIndex]="orderParams.pageNumber - 1"
+          (page)="onOrderPageChange($event)" showFirstLastButtons>
+        </mat-paginator>
+      </div>
+    </mat-tab>
 
-                    <ng-container matColumnDef="price">
-                        <th mat-header-cell *matHeaderCellDef> Price </th>
-                        <td mat-cell *matCellDef="let product"> {{product.price | currency:'EGP ': true}} </td>
-                    </ng-container>
+    <!-- Products -->
+    <mat-tab>
+      <ng-template mat-tab-label><mat-icon>inventory_2</mat-icon> Product catalog</ng-template>
 
-                    <ng-container matColumnDef="type">
-                        <th mat-header-cell *matHeaderCellDef> Type </th>
-                        <td mat-cell *matCellDef="let product"> {{product.type}} </td>
-                    </ng-container>
+      <div class="panel">
+        <div class="panel-head">
+          <h2 class="display text-2xl">Product catalog</h2>
+          <a routerLink="product" class="btn-primary add-btn"><mat-icon>add</mat-icon> Add new product</a>
+        </div>
 
-                    <ng-container matColumnDef="brand">
-                        <th mat-header-cell *matHeaderCellDef> Brand </th>
-                        <td mat-cell *matCellDef="let product"> {{product.brand}} </td>
-                    </ng-container>
+        <div class="table-wrap">
+          <table mat-table [dataSource]="dataSourceProducts" class="table">
+            <ng-container matColumnDef="id">
+              <th mat-header-cell *matHeaderCellDef>No.</th>
+              <td mat-cell *matCellDef="let product" class="muted">{{ product.id }}</td>
+            </ng-container>
 
-                    <ng-container matColumnDef="quantityInStock">
-                        <th mat-header-cell *matHeaderCellDef> Quantity In Stock </th>
-                        <td mat-cell *matCellDef="let product"> {{product.quantityInStock}} </td>
-                    </ng-container>
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef>Product</th>
+              <td mat-cell *matCellDef="let product">
+                <span class="product">
+                  <span class="thumb"><img [src]="product.pictureUrl" alt="" /></span>
+                  <span class="product-name">{{ product.name }}</span>
+                </span>
+              </td>
+            </ng-container>
 
+            <ng-container matColumnDef="price">
+              <th mat-header-cell *matHeaderCellDef>Price</th>
+              <td mat-cell *matCellDef="let product" class="num">{{ product.price | currency: 'EGP ' : 'symbol' : '1.0-0' }}</td>
+            </ng-container>
 
-                    <ng-container matColumnDef="action">
-                        <th mat-header-cell *matHeaderCellDef> Actions </th>
-                        <td mat-cell *matCellDef="let product">
-                            <div class="flex gap-2">
-                                <button mat-icon-button routerLink="product/{{product.id}}" [matTooltip]="'Edit'">
-                                    <mat-icon class="text-grey-500">edit</mat-icon>
-                                </button>
-                                <button mat-icon-button [matTooltip]="'Delete'"
-                                    (click)="openProductConfirmDialog(product.id)">
-                                    <mat-icon class="text-red-500">delete</mat-icon>
-                                </button>
+            <ng-container matColumnDef="type">
+              <th mat-header-cell *matHeaderCellDef>Type</th>
+              <td mat-cell *matCellDef="let product"><span class="tag">{{ product.type }}</span></td>
+            </ng-container>
 
-                            </div>
+            <ng-container matColumnDef="brand">
+              <th mat-header-cell *matHeaderCellDef>Brand</th>
+              <td mat-cell *matCellDef="let product" class="muted">{{ product.brand }}</td>
+            </ng-container>
 
-                        </td>
-                    </ng-container>
+            <ng-container matColumnDef="quantityInStock">
+              <th mat-header-cell *matHeaderCellDef>Stock</th>
+              <td mat-cell *matCellDef="let product">
+                <span class="stock" [attr.data-tone]="product.quantityInStock === 0 ? 'out' : product.quantityInStock <= 5 ? 'low' : 'in'">
+                  <span class="dot"></span>
+                  {{ product.quantityInStock === 0 ? 'Sold out' : product.quantityInStock + ' in stock' }}
+                </span>
+              </td>
+            </ng-container>
 
-                    <tr mat-header-row *matHeaderRowDef="displayedProductColumns"></tr>
-                    <tr mat-row *matRowDef="let row; columns: displayedProductColumns;"></tr>
-                </table>
-                <mat-paginator class="bg-white" [pageSizeOptions]="[5,10,15]" [length]="totalProducts"
-                    [pageSize]="shopParams.pageSize" (page)="onProductPageChange($event)" showFirstLastButtons>
-                </mat-paginator>
+            <ng-container matColumnDef="action">
+              <th mat-header-cell *matHeaderCellDef class="right">Actions</th>
+              <td mat-cell *matCellDef="let product" class="right">
+                <span class="actions">
+                  <a class="icon-btn" [routerLink]="['product', product.id]" matTooltip="Edit" [attr.aria-label]="'Edit ' + product.name">
+                    <mat-icon>edit</mat-icon>
+                  </a>
+                  <button type="button" class="icon-btn danger" matTooltip="Delete" (click)="openProductConfirmDialog(product.id)"
+                    [attr.aria-label]="'Delete ' + product.name">
+                    <mat-icon>delete_outline</mat-icon>
+                  </button>
+                </span>
+              </td>
+            </ng-container>
 
-            </div>
-        </mat-tab>
-    </mat-tab-group>
+            <tr mat-header-row *matHeaderRowDef="displayedProductColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedProductColumns"></tr>
+            <tr class="mat-row" *matNoDataRow>
+              <td class="empty-cell" [attr.colspan]="displayedProductColumns.length">
+                <mat-icon>inventory_2</mat-icon> No products yet
+              </td>
+            </tr>
+          </table>
+        </div>
+
+        <mat-paginator class="pager" [pageSizeOptions]="[5, 10, 15]" [length]="totalProducts"
+          [pageSize]="shopParams.pageSize" (page)="onProductPageChange($event)" showFirstLastButtons>
+        </mat-paginator>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
 </div>

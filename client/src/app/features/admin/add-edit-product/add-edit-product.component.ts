@@ -1,24 +1,21 @@
 import { Component, inject, OnInit } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { CurrencyPipe } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Product, ProductToCreate } from '../../../shared/models/product';
 import { ShopService } from '../../../core/services/shop.service';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
-import { MatCard } from '@angular/material/card';
-import { MatInput, MatFormField, MatLabel } from '@angular/material/input';
 import { TextInputComponent } from '../../../shared/components/text-input/text-input.component';
 import { BusyService } from '../../../core/services/busy.service';
 import { AdminService } from '../../../core/services/admin.service';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { SnackbarService } from '../../../core/services/snackbar.service';
 
 @Component({
   selector: 'app-add-edit-product',
   imports: [
     ReactiveFormsModule,
-    MatCard,
-    MatButton,
+    CurrencyPipe,
     MatIcon,
     RouterLink,
     TextInputComponent
@@ -45,6 +42,9 @@ export class AddEditProductComponent implements OnInit {
     brand:['',Validators.required],
     quantityInStock: [null as number | null, [Validators.required,Validators.min(0)]]
   });
+  /** Live values for the preview card. */
+  preview = toSignal(this.productForm.valueChanges, { initialValue: this.productForm.getRawValue() });
+
   ngOnInit(): void {
     this.loadProduct();
   }

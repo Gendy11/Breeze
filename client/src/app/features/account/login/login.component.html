@@ -1,19 +1,49 @@
-<mat-card class="max-w-lg mx-auto mt-32 p-8 bg-white">
-<form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-  <div class="text-center mb-6">
-    <h1 class="text-3xl font-semibold primary">Login</h1>
-  </div>
-  <mat-form-field appearance="fill" class="w-full mb-4">
-    <mat-label>Email Address</mat-label>
-    <input matInput placeholder="Enter your email" formControlName="email" type="email">
-  </mat-form-field>
-    <mat-form-field appearance="fill" class="w-full mb-4">
-    <mat-label>Password</mat-label>
-    <input matInput placeholder="Enter your password" formControlName="password" type="password">
-  </mat-form-field>
-  <button mat-flat-button color="primary" class="w-full py-2" type="submit" [disabled]="loginForm.invalid">
-    Sign in
-  </button>
+<div class="px-2 sm:px-4 pb-16">
+  <div class="auth rise">
+    <!-- Visual side -->
+    <aside class="auth-visual" aria-hidden="true">
+      <div class="aurora dark">
+        <span class="blob blob-1"></span>
+        <span class="blob blob-2"></span>
+      </div>
+      <img class="auth-photo" src="/images/background.jpg" alt="" />
 
-</form>
-</mat-card>
+      <span class="auth-logo">B</span>
+
+      <div class="relative">
+        <p class="auth-quote">Your signature scent is <em class="shimmer light">waiting.</em></p>
+        <ul class="auth-points">
+          <li><mat-icon>shopping_bag</mat-icon> Pick up where you left your bag</li>
+          <li><mat-icon>receipt_long</mat-icon> Track every order in one place</li>
+          <li><mat-icon>bolt</mat-icon> Check out in seconds</li>
+        </ul>
+      </div>
+    </aside>
+
+    <!-- Form side -->
+    <section class="auth-form">
+      <span class="eyebrow"><span class="spark">✦</span> Welcome back</span>
+      <h1 class="display mt-4 text-4xl">Log in to <em class="shimmer">Breeze</em></h1>
+      <p class="mt-2 mb-8 text-slate-600">Enter your details to continue.</p>
+
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
+        <app-text-input label="Email address" formControlName="email" type="email" icon="mail"
+          placeholder="you@example.com" autocomplete="email" />
+        <app-text-input label="Password" formControlName="password" type="password" icon="lock"
+          placeholder="Your password" autocomplete="current-password" />
+
+        <button type="submit" class="btn-primary submit" [disabled]="loginForm.invalid || submitting()">
+          @if (submitting()) {
+            <mat-spinner diameter="20" strokeWidth="3"></mat-spinner> Signing in…
+          } @else {
+            Sign in <mat-icon class="arrow">arrow_forward</mat-icon>
+          }
+        </button>
+      </form>
+
+      <p class="switch">
+        New to Breeze? <a routerLink="/account/register">Create an account</a>
+      </p>
+    </section>
+  </div>
+</div>

@@ -1,0 +1,33 @@
+// .choice, .choice-grid, .choice-icon, .choice-text and .radio-dot come from src/brand.scss.
+
+:host { display: block; }
+
+.choice-text .time {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-top: 0.2rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--brand-blue);
+
+  mat-icon { font-size: 0.95rem; width: 0.95rem; height: 0.95rem; }
+}
+
+.price {
+  flex-shrink: 0;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.skeleton {
+  height: 5.5rem;
+  background: #f1f5f9;
+  border-color: transparent;
+  cursor: default;
+  animation: pulse-bg 1.4s ease-in-out infinite;
+}
+
+@keyframes pulse-bg {
+  50% { opacity: 0.5; }
+}

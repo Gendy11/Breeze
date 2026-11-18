@@ -1,14 +1,164 @@
-<div class="max-w-screen-2xl mx-auto px-4">
-    <div class="flex flex-col items-center py-16 justify-center mt-10 rounded-2xl shadow-xl relative">
-        <img class="absolute inset-0 w-full h-full object-cover rounded-2xl" src="../images/background.jpg" alt="perfumes">
-        <div class="flex flex-col p-8 rounded-2xl items-center relative">
-            <h1 class="my-6 font-extrabold text-black text-6xl">
-                Welcome to Breeze!
-            </h1>
-            <button class="bg-gradient-to-r from-blue-600 to-cyan-500 font-semibold text-2xl text-white rounded-2xl px-8 py-4 
-            border-2 border-transparent mt-8 cursor-pointer" routerLink="/shop">
-                Go to shop
-            </button>
-        </div>
+<div class="home max-w-screen-2xl mx-auto px-2 sm:px-4 flex flex-col gap-24 pb-16">
+
+  <!-- ============ HERO ============ -->
+  <section class="hero relative overflow-hidden rounded-[2rem] px-6 py-14 sm:px-12 lg:px-16 lg:py-20">
+    <div class="aurora" aria-hidden="true">
+      <span class="blob blob-1"></span>
+      <span class="blob blob-2"></span>
+      <span class="blob blob-3"></span>
     </div>
+
+    <div class="relative grid items-center gap-14 lg:grid-cols-2">
+      <!-- Copy -->
+      <div class="flex flex-col items-start">
+        <span class="eyebrow rise" style="--d: 0ms">
+          <span class="spark">✦</span> The fragrance edit
+        </span>
+
+        <h1 class="display mt-6 text-5xl leading-[1.02] sm:text-6xl xl:text-7xl rise" style="--d: 80ms">
+          Wear the <em class="shimmer">breeze.</em><br />
+          Leave an impression.
+        </h1>
+
+        <p class="mt-6 max-w-lg text-lg leading-relaxed text-slate-600 rise" style="--d: 160ms">
+          Designer perfumes from the houses you love, curated in one place and
+          delivered to your door, effortlessly.
+        </p>
+
+        <div class="mt-10 flex flex-wrap items-center gap-4 rise" style="--d: 240ms">
+          <a routerLink="/shop" class="btn-primary group">
+            Shop the collection
+            <mat-icon class="arrow">arrow_forward</mat-icon>
+          </a>
+          <a href="#featured" class="btn-ghost">See bestsellers</a>
+        </div>
+
+        <ul class="mt-12 grid w-full max-w-lg grid-cols-3 gap-4 rise" style="--d: 320ms">
+          <li class="perk"><mat-icon>verified</mat-icon><span>Designer houses</span></li>
+          <li class="perk"><mat-icon>lock</mat-icon><span>Secure checkout</span></li>
+          <li class="perk"><mat-icon>bolt</mat-icon><span>Fast delivery</span></li>
+        </ul>
+      </div>
+
+      <!-- Stage -->
+      <div class="stage rise" style="--d: 200ms">
+        <img class="stage-bg" src="/images/background.jpg" alt="" aria-hidden="true" />
+
+        @if (heroProduct(); as p) {
+          <a [routerLink]="['/shop', p.id]" class="stage-product" [attr.aria-label]="'View ' + p.name">
+            <img [src]="p.pictureUrl" [alt]="p.name" />
+          </a>
+
+          <a [routerLink]="['/shop', p.id]" class="glass chip-top">
+            <span class="text-[11px] uppercase tracking-[0.2em] text-slate-500">{{ p.brand }}</span>
+            <span class="display text-lg leading-tight">{{ p.name }}</span>
+            <span class="text-sm font-semibold text-[var(--brand-blue)]">{{ p.price | currency: 'EGP ' : 'symbol' : '1.0-0' }}</span>
+          </a>
+        }
+
+        <div class="glass chip-bottom">
+          <span class="pulse"></span>
+          <span class="text-sm font-medium">Signature pick of the season</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ BRAND MARQUEE ============ -->
+  @if (shopService.brands.length) {
+    <section class="marquee reveal" aria-label="Brands we carry">
+      <div class="marquee-track">
+        @for (round of [0, 1]; track round) {
+          <div class="marquee-group" [attr.aria-hidden]="round === 1 ? 'true' : null">
+            @for (brand of shopService.brands; track brand) {
+              <span class="display italic">{{ brand }}</span>
+              <span class="spark">✦</span>
+            }
+            @for (brand of shopService.brands; track brand) {
+              <span class="display italic">{{ brand }}</span>
+              <span class="spark">✦</span>
+            }
+          </div>
+        }
+      </div>
+    </section>
+  }
+
+  <!-- ============ FEATURED ============ -->
+  <section id="featured" class="scroll-mt-24">
+    <div class="mb-10 flex flex-wrap items-end justify-between gap-4 reveal">
+      <div>
+        <span class="eyebrow"><span class="spark">✦</span> Bestsellers</span>
+        <h2 class="display mt-4 text-4xl sm:text-5xl">Signature scents</h2>
+      </div>
+      <a routerLink="/shop" class="link-arrow group">
+        View all fragrances <mat-icon class="arrow">arrow_forward</mat-icon>
+      </a>
+    </div>
+
+    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      @if (loading()) {
+        @for (i of [0, 1, 2, 3]; track i) {
+          <div class="card skeleton" aria-hidden="true">
+            <div class="card-media"></div>
+            <div class="h-4 w-1/3 rounded bg-slate-200"></div>
+            <div class="h-6 w-2/3 rounded bg-slate-200"></div>
+          </div>
+        }
+      } @else {
+        @for (p of products(); track p.id; let i = $index) {
+          <a [routerLink]="['/shop', p.id]" class="card group reveal" [style.--tint]="tints[i % tints.length]">
+            <div class="card-media">
+              <img [src]="p.pictureUrl" [alt]="p.name" loading="lazy" />
+              <span class="card-cta"><mat-icon>arrow_outward</mat-icon></span>
+            </div>
+            <span class="text-[11px] uppercase tracking-[0.2em] text-slate-500">{{ p.brand }}</span>
+            <div class="flex items-baseline justify-between gap-3">
+              <h3 class="display text-xl leading-snug">{{ p.name }}</h3>
+              <span class="shrink-0 font-semibold text-[var(--brand-navy)]">{{ p.price | currency: 'EGP ' : 'symbol' : '1.0-0' }}</span>
+            </div>
+          </a>
+        }
+      }
+    </div>
+  </section>
+
+  <!-- ============ HOW IT WORKS ============ -->
+  <section class="reveal">
+    <div class="mx-auto mb-12 max-w-2xl text-center">
+      <span class="eyebrow"><span class="spark">✦</span> Effortless by design</span>
+      <h2 class="display mt-4 text-4xl sm:text-5xl">From first spritz to your doorstep</h2>
+    </div>
+
+    <ol class="grid gap-6 md:grid-cols-3">
+      @for (s of steps; track s.title; let i = $index) {
+        <li class="step">
+          <span class="step-num display">0{{ i + 1 }}</span>
+          <span class="step-icon"><mat-icon>{{ s.icon }}</mat-icon></span>
+          <h3 class="display mt-6 text-2xl">{{ s.title }}</h3>
+          <p class="mt-2 leading-relaxed text-slate-600">{{ s.text }}</p>
+        </li>
+      }
+    </ol>
+  </section>
+
+  <!-- ============ CTA BAND ============ -->
+  <section class="cta relative overflow-hidden rounded-[2rem] px-8 py-16 text-center sm:px-16 sm:py-20 reveal">
+    <div class="aurora dark" aria-hidden="true">
+      <span class="blob blob-1"></span>
+      <span class="blob blob-2"></span>
+    </div>
+    <div class="relative mx-auto flex max-w-2xl flex-col items-center">
+      <h2 class="display text-4xl text-white sm:text-5xl">
+        Your next signature scent is <em class="shimmer light">one click away.</em>
+      </h2>
+      <p class="mt-5 text-lg text-blue-100/80">
+        Explore the full collection and find the fragrance that feels like you.
+      </p>
+      <a routerLink="/shop" class="btn-light group mt-10">
+        Start exploring
+        <mat-icon class="arrow">arrow_forward</mat-icon>
+      </a>
+    </div>
+  </section>
 </div>

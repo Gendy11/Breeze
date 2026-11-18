@@ -1,0 +1,296 @@
+// Shared tokens, type, buttons and .aurora live in src/brand.scss.
+
+:host {
+  display: block;
+  color: var(--brand-navy);
+}
+
+/* ---------- Hero ---------- */
+.hero {
+  background:
+    radial-gradient(120% 80% at 0% 0%, #f2f8ff 0%, transparent 60%),
+    linear-gradient(160deg, #ffffff 0%, #eef6ff 55%, #e5f6f8 100%);
+  border: 1px solid rgb(13 27 62 / 0.06);
+  box-shadow: 0 30px 80px -40px rgb(13 27 62 / 0.25);
+}
+
+.perk {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--ink-soft);
+
+  mat-icon {
+    color: var(--brand-blue);
+    font-size: 1.35rem;
+    width: 1.35rem;
+    height: 1.35rem;
+  }
+}
+
+/* Stage (podium visual) */
+.stage {
+  position: relative;
+  aspect-ratio: 5 / 4;
+  border-radius: 1.75rem;
+  overflow: hidden;
+  box-shadow: 0 40px 80px -40px rgb(13 27 62 / 0.45);
+  isolation: isolate;
+}
+
+.stage-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 55% 100%;
+  transform: scale(1.04);
+}
+
+.stage-product {
+  position: absolute;
+  left: 50%;
+  bottom: 18%;
+  width: 52%;
+  translate: -50% 0;
+  animation: float 6s ease-in-out infinite;
+
+  img {
+    width: 100%;
+    mix-blend-mode: multiply; // melts the white product backgrounds into the scene
+    filter: drop-shadow(0 20px 18px rgb(13 27 62 / 0.18));
+    transition: transform 0.5s var(--ease-out);
+  }
+  &:hover img { transform: scale(1.05) rotate(-2deg); }
+}
+
+.glass {
+  position: absolute;
+  display: flex;
+  border-radius: 1rem;
+  background: rgb(255 255 255 / 0.72);
+  backdrop-filter: blur(14px) saturate(140%);
+  border: 1px solid rgb(255 255 255 / 0.8);
+  box-shadow: 0 16px 40px -18px rgb(13 27 62 / 0.4);
+  color: var(--brand-navy);
+  text-decoration: none;
+}
+
+.chip-top {
+  top: 6%;
+  left: 5%;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.9rem 1.1rem;
+  max-width: 55%;
+  animation: float 7s ease-in-out infinite reverse;
+}
+
+.chip-bottom {
+  right: 5%;
+  bottom: 6%;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.65rem 1rem;
+  animation: float 8s ease-in-out infinite;
+}
+
+.pulse {
+  position: relative;
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  background: #22c55e;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: inherit;
+    animation: ping 1.8s var(--ease-out) infinite;
+  }
+}
+
+/* ---------- Marquee ---------- */
+.marquee {
+  overflow: hidden;
+  padding: 1.75rem 0;
+  border-block: 1px solid rgb(13 27 62 / 0.08);
+  mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 40s linear infinite;
+
+  &:hover { animation-play-state: paused; }
+}
+
+.marquee-group {
+  display: flex;
+  align-items: center;
+  gap: 2.5rem;
+  padding-right: 2.5rem;
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
+  color: var(--brand-navy);
+  white-space: nowrap;
+
+  .spark { font-size: 1rem; opacity: 0.6; }
+}
+
+/* ---------- Product cards ---------- */
+.link-arrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-weight: 600;
+  color: var(--brand-blue);
+  text-decoration: none;
+
+  .arrow {
+    font-size: 1.1rem;
+    width: 1.1rem;
+    height: 1.1rem;
+    transition: transform 0.3s var(--ease-out);
+  }
+  &:hover .arrow { transform: translateX(4px); }
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  color: var(--brand-navy);
+  text-decoration: none;
+  border-radius: 1.5rem;
+  outline: none;
+
+  &:focus-visible .card-media { box-shadow: 0 0 0 3px rgb(47 127 240 / 0.5); }
+}
+
+.card-media {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  margin-bottom: 0.5rem;
+  border-radius: 1.5rem;
+  overflow: hidden;
+  background: var(--tint, #eef2f7);
+  transition: transform 0.5s var(--ease-out), box-shadow 0.5s var(--ease-out);
+
+  img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 8%;
+    mix-blend-mode: multiply;
+    transition: transform 0.7s var(--ease-out);
+  }
+}
+
+.card-cta {
+  position: absolute;
+  right: 1rem;
+  bottom: 1rem;
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 50%;
+  background: var(--brand-navy);
+  color: #fff;
+  opacity: 0;
+  transform: translateY(8px) scale(0.9);
+  transition: all 0.4s var(--ease-out);
+
+  mat-icon { font-size: 1.25rem; width: 1.25rem; height: 1.25rem; }
+}
+
+.card:hover,
+.card:focus-visible {
+  .card-media {
+    transform: translateY(-6px);
+    box-shadow: 0 30px 50px -30px rgb(13 27 62 / 0.45);
+  }
+  .card-media img { transform: scale(1.08) rotate(-3deg); }
+  .card-cta { opacity: 1; transform: none; }
+}
+
+.skeleton {
+  .card-media,
+  div { animation: pulse-bg 1.4s ease-in-out infinite; }
+  .card-media { background: #eef2f7; }
+}
+
+/* ---------- Steps ---------- */
+.step {
+  position: relative;
+  overflow: hidden;
+  padding: 2rem;
+  border-radius: 1.5rem;
+  background: #fff;
+  border: 1px solid rgb(13 27 62 / 0.08);
+  transition: transform 0.4s var(--ease-out), box-shadow 0.4s var(--ease-out), border-color 0.4s;
+
+  &:hover {
+    transform: translateY(-4px);
+    border-color: rgb(47 127 240 / 0.3);
+    box-shadow: 0 30px 50px -35px rgb(13 27 62 / 0.4);
+    .step-icon { transform: rotate(-8deg) scale(1.08); }
+  }
+}
+
+.step-num {
+  position: absolute;
+  top: 0.5rem;
+  right: 1.25rem;
+  font-size: 4.5rem;
+  font-style: italic;
+  color: rgb(47 127 240 / 0.08);
+  line-height: 1;
+}
+
+.step-icon {
+  display: grid;
+  place-items: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  border-radius: 1rem;
+  background: linear-gradient(135deg, var(--brand-blue), var(--brand-aqua));
+  color: #fff;
+  box-shadow: 0 12px 24px -10px rgb(47 127 240 / 0.6);
+  transition: transform 0.4s var(--ease-out);
+}
+
+/* ---------- CTA ---------- */
+.cta {
+  background: radial-gradient(120% 120% at 50% 0%, #17306b 0%, var(--brand-navy) 60%);
+}
+
+/* ---------- Motion ---------- */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+@keyframes marquee {
+  to { transform: translateX(-50%); }
+}
+@keyframes ping {
+  75%, 100% { transform: scale(2.4); opacity: 0; }
+}
+@keyframes pulse-bg {
+  50% { opacity: 0.5; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

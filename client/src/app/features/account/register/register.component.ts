@@ -1,28 +1,14 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatButton } from '@angular/material/button';
-import { MatCard } from '@angular/material/card';
+import { Router, RouterLink } from '@angular/router';
 import { MatIcon } from '@angular/material/icon';
-import { MatError, MatFormField, MatInput, MatLabel } from '@angular/material/input';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { AccountService } from '../../../core/services/account.service';
-import { Router } from '@angular/router';
-import { JsonPipe } from '@angular/common';
-import { TextInputComponent } from "../../../shared/components/text-input/text-input.component";
+import { TextInputComponent } from '../../../shared/components/text-input/text-input.component';
 
 @Component({
   selector: 'app-register',
-  imports: [
-    ReactiveFormsModule,
-    MatCard,
-    MatFormField,
-    MatLabel,
-    MatInput,
-    MatIcon,
-    MatButton,
-    JsonPipe,
-    MatError,
-    TextInputComponent
-],
+  imports: [ReactiveFormsModule, RouterLink, MatIcon, MatProgressSpinner, TextInputComponent],
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss'
 })
@@ -31,22 +17,28 @@ export class RegisterComponent {
   private accountService = inject(AccountService);
   private router = inject(Router);
 
-  validationErrors?:string[];
+  validationErrors?: string[];
+  submitting = signal(false);
 
   registerForm = this.fb.group({
-    firstName:['', Validators.required],
-    lastName:['', Validators.required],
-    email:['', [Validators.required, Validators.email]],
-    password:['',Validators.required],
+    firstName: ['', Validators.required],
+    lastName: ['', Validators.required],
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', Validators.required],
   });
-  onSubmit(){
+
+  onSubmit() {
+    if (this.registerForm.invalid || this.submitting()) return;
+    this.submitting.set(true);
+    this.validationErrors = undefined;
     this.accountService.register(this.registerForm.value).subscribe({
-      next:()=>{
+      next: () => {
         this.router.navigateByUrl('/account/login');
       },
-      error:errors =>{
-        this.validationErrors = errors
+      error: errors => {
+        this.validationErrors = errors;
+        this.submitting.set(false);
       }
-    })
+    });
   }
 }

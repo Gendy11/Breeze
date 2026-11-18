@@ -1,49 +1,54 @@
-@if(signalrService.orderSignal(); as order){
-<section class="bg-white py-16">
-    <div class="mx-auto max-w-2xl px-2">
-        <h2 class="font-semibold text-2xl mb-2">Thanks for your fake order!</h2>
-        <p class="text-gray-500 mb-8">Your order <span class="font-medium">#{{order.id}}</span> will never be processed
-            as this
-            is a fake shop. We will not notify you once your order has not shipped.
+<div class="max-w-screen-2xl mx-auto px-2 sm:px-4 pb-16">
+  <section class="hero relative overflow-hidden rounded-[2rem] rise">
+    <div class="aurora" aria-hidden="true">
+      <span class="blob blob-1"></span>
+      <span class="blob blob-2"></span>
+      <span class="blob blob-3"></span>
+    </div>
+
+    <div class="relative mx-auto flex max-w-2xl flex-col items-center text-center">
+      @if (signalrService.orderSignal(); as order) {
+        <span class="badge done" aria-hidden="true">
+          <svg viewBox="0 0 52 52"><path d="M14 27 l8 8 l16 -18" /></svg>
+        </span>
+
+        <span class="eyebrow mt-8"><span class="spark">✦</span> Order #{{ order.id }}</span>
+        <h1 class="display mt-4 text-4xl sm:text-5xl">Thanks for your <em class="shimmer">fake order!</em></h1>
+        <p class="mt-4 text-lg leading-relaxed text-slate-600">
+          Your order will never be processed as this is a fake shop.
+          We will not notify you once your order has not shipped.
         </p>
-        <div class="space-y-2 rounded-lg border border-gray-100 bg-gray-50 p-6 mb-8">
-            <dl class="flex items-center justify-between gap-4">
-                <dt class="font-normal text-gray-500">Date</dt>
-                <dd class="font-medium text-gray-900 text-end">{{order.orderDate | date:'medium'}}</dd>
-            </dl>
-            <dl class="flex items-center justify-between gap-4">
-                <dt class="font-normal text-gray-500">Payment method</dt>
-                <dd class="font-medium text-gray-900 text-end">{{order.paymentSummary | payment}}</dd>
-            </dl>
-            <dl class="flex items-center justify-between gap-4">
-                <dt class="font-normal text-gray-500">Address</dt>
-                <dd class="font-medium text-gray-900 text-end">{{order.shippingAddress | address}}</dd>
-            </dl>
-            <dl class="flex items-center justify-between gap-4">
-                <dt class="font-normal text-gray-500">Amount</dt>
-                <dd class="font-medium text-gray-900 text-end">{{order.subtotal + order.deliveryMethod.price| currency:'EGP ':true}}</dd>
-            </dl>
+
+        <dl class="receipt">
+          <div><dt>Date</dt><dd>{{ order.orderDate | date: 'medium' }}</dd></div>
+          <div><dt>Payment</dt><dd>{{ order.paymentSummary | payment }}</dd></div>
+          <div><dt>Address</dt><dd>{{ order.shippingAddress | address }}</dd></div>
+          <div class="total">
+            <dt>Amount</dt>
+            <dd class="display">{{ order.subtotal + order.deliveryMethod.price | currency: 'EGP ' : 'symbol' : '1.0-0' }}</dd>
+          </div>
+        </dl>
+
+        <div class="mt-10 flex flex-wrap justify-center gap-3">
+          <a [routerLink]="['/orders', order.id]" class="btn-primary">
+            <mat-icon>receipt_long</mat-icon> View your order
+          </a>
+          <a routerLink="/shop" class="btn-ghost">Continue shopping</a>
         </div>
-        <div class="flex items-center space-x-4">
-            <button routerLink="/orders/{{order.id}}" mat-flat-button>View your order</button>
-            <button routerLink="/shop" mat-stroked-button>Continue shopping</button>
+      } @else {
+        <span class="badge pending" aria-hidden="true">
+          <mat-spinner diameter="44" strokeWidth="4"></mat-spinner>
+        </span>
+
+        <h1 class="display mt-8 text-4xl sm:text-5xl">Creating your <em class="shimmer">order</em></h1>
+        <p class="mt-4 text-lg text-slate-600" role="status">
+          Your payment has been received. We are creating the order. This only takes a moment.
+        </p>
+
+        <div class="mt-10">
+          <a routerLink="/shop" class="btn-ghost">Continue shopping</a>
         </div>
+      }
     </div>
-</section>
-}@else{
-<section class="bg-white py-16">
-    <div class="mx-auto max-w-2xl px-2">
-        <h2 class="font-semibold text-2xl mb-2">Order processing, please wait</h2>
-        <div class="space-y-2 rounded-lg border border-gray-100 bg-gray-50 p-6 mb-8">
-            <div class="flex flex-col justify-center items-center">
-                <mat-spinner diameter="30"></mat-spinner>
-                <p class="text-xl">Loading order...</p>
-                <span>Your payment has been received. We are creating the order</span>
-            </div>
-        </div>
-        <div class="flex items-center space-x-4">
-            <button routerLink="/shop" mat-stroked-button>Continue shopping</button>
-        </div>
-    </div>
-</section>
-}
+  </section>
+</div>

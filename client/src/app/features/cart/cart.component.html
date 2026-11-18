@@ -1,17 +1,52 @@
-<section>
-    @if (cartService.cart()?.items?.length! > 0){
-        <div class="flex w-full items-start gap-6 mt-3">
-            <div class="w-3/4">
-                @for(item of cartService.cart()?.items;track item.productId){
-                <app-cart-item [item]="item"></app-cart-item>
-                }
-            </div>
-            <div class="w-1/4">
-                <app-order-summary></app-order-summary>
-            </div>
-        </div>
-    }@else{
-        <app-empty-state message="Your shopping cart is empty" icon="remove_shopping_cart" actionText="Go to shop" (action)="navigateToShop()"></app-empty-state>
-    }
+<div class="cart max-w-screen-2xl mx-auto px-2 sm:px-4 pb-16">
+  @if (items().length > 0) {
+    <!-- Heading -->
+    <header class="mb-10 flex flex-wrap items-end justify-between gap-4 rise">
+      <div>
+        <span class="eyebrow"><span class="spark">✦</span> Your bag</span>
+        <h1 class="display mt-4 text-4xl sm:text-5xl">
+          Shopping <em class="shimmer">bag</em>
+        </h1>
+        <p class="mt-2 text-slate-600">
+          {{ count() }} {{ count() === 1 ? 'item' : 'items' }} ready for checkout
+        </p>
+      </div>
+      <a routerLink="/shop" class="link-back">
+        <mat-icon>arrow_back</mat-icon> Continue shopping
+      </a>
+    </header>
 
-</section>
+    <div class="grid items-start gap-8 lg:grid-cols-[1fr_24rem] xl:gap-12">
+      <ul class="items" aria-label="Items in your bag">
+        @for (item of items(); track item.productId; let i = $index) {
+          <li class="rise" [style.--d]="i * 60 + 'ms'">
+            <app-cart-item [item]="item" [tint]="tints[item.productId % tints.length]"></app-cart-item>
+          </li>
+        }
+      </ul>
+
+      <aside class="summary-col rise" style="--d: 120ms">
+        <app-order-summary></app-order-summary>
+      </aside>
+    </div>
+  } @else {
+    <!-- Empty bag -->
+    <section class="empty relative overflow-hidden rounded-[2rem] rise">
+      <div class="aurora" aria-hidden="true">
+        <span class="blob blob-1"></span>
+        <span class="blob blob-2"></span>
+        <span class="blob blob-3"></span>
+      </div>
+      <div class="relative flex flex-col items-center text-center">
+        <span class="empty-icon"><mat-icon>shopping_bag</mat-icon></span>
+        <h1 class="display mt-8 text-4xl sm:text-5xl">Your bag is <em class="shimmer">empty</em></h1>
+        <p class="mt-4 max-w-md text-lg text-slate-600">
+          Your next signature scent is waiting. Explore the collection and find one you love.
+        </p>
+        <a routerLink="/shop" class="btn-primary mt-10">
+          Explore fragrances <mat-icon class="arrow">arrow_forward</mat-icon>
+        </a>
+      </div>
+    </section>
+  }
+</div>

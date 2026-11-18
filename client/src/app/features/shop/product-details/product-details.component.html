@@ -1,44 +1,131 @@
-@if (product){
-    <section class="py-8">
-        <div class="max-w-screen-2xl px-4 mx-auto">
-            <div class="grid grid-cols-2 gap-8">
-                <div class="max-w-xl mx-auto ">
-                    <img class="w-full" src="{{product.pictureUrl}}" alt="Product image">
-                </div>
-                <div>
-                    <h1 class="text-2xl font-semibold text-gray-900">{{product.name}}</h1>
+<div class="pd max-w-screen-2xl mx-auto px-2 sm:px-4 pb-16">
 
-                    <p>You have {{quantityInCart}} of this item in your cart</p>
-                    <div class="mt-4 items-center gap-4 flex">
-                        <p class="text-3xl font-extrabold text-gray-900">
-                            {{product.price | currency:'EGP ':true}}
-                        </p>
-                    </div>
-                    <div class="flex gap-4 mt-6">
-                        <button [disabled]="quantity == quantityInCart || product.quantityInStock === 0 || 
-                        quantity > product.quantityInStock || quantityInCart >= product.quantityInStock" mat-flat-button class="match-input-height" style="height: 56px !important;" 
-                        (click)="updateCart()">
-                            <mat-icon>shopping_cart</mat-icon>
-                            {{getButtonText()}}
-                        </button>
-                        <mat-form-field appearance="outline" class="flex">
-                            <mat-label>Quantity</mat-label>
-                            <input matInput min="0" [(ngModel)]="quantity" type="number">
-                        </mat-form-field>
-                    </div>
-                    <mat-divider></mat-divider>
-                    <p class="mt-6 text-gray-500">
-                        {{product.description}}
-                    </p>
-                    <p class="mt-10 font-semibold">
-                        @if(product.quantityInStock > 0){
-                            There are only {{product.quantityInStock}} items left in stock, hurry up!
-                        }@else {
-                            Item out of stock.
-                        }
-                    </p>
-                </div>
-            </div>
+  @if (product(); as p) {
+    <!-- Breadcrumb -->
+    <nav class="crumbs" aria-label="Breadcrumb">
+      <a routerLink="/shop" class="back"><mat-icon>arrow_back</mat-icon> Shop</a>
+      <span class="sep">/</span>
+      <span>{{ p.brand }}</span>
+      <span class="sep">/</span>
+      <span class="current" aria-current="page">{{ p.name }}</span>
+    </nav>
+
+    <section class="grid items-start gap-10 lg:grid-cols-[1.1fr_1fr] lg:gap-16" [class.dim]="loading()">
+      <!-- ============ STAGE ============ -->
+      <div class="stage rise">
+        <div class="aurora" aria-hidden="true">
+          <span class="blob blob-1"></span>
+          <span class="blob blob-2"></span>
+          <span class="blob blob-3"></span>
         </div>
+        <span class="podium" aria-hidden="true"></span>
+        <img class="bottle" [src]="p.pictureUrl" [alt]="p.name" />
+
+        <span class="stage-tag glass">
+          <mat-icon>verified</mat-icon> {{ p.brand }}
+        </span>
+      </div>
+
+      <!-- ============ INFO ============ -->
+      <div class="info">
+        <span class="eyebrow rise" style="--d: 60ms"><span class="spark">✦</span> {{ p.brand }}</span>
+
+        <h1 class="display mt-5 text-4xl leading-[1.05] sm:text-5xl xl:text-6xl rise" style="--d: 120ms">
+          {{ p.name }}
+        </h1>
+
+        <div class="mt-6 flex flex-wrap items-center gap-4 rise" style="--d: 180ms">
+          <span class="price display">{{ p.price | currency: 'EGP ' : 'symbol' : '1.0-0' }}</span>
+          <span class="stock" [attr.data-tone]="stockState().tone">
+            <span class="dot"></span>{{ stockState().label }}
+          </span>
+        </div>
+
+        <p class="mt-6 max-w-xl text-lg leading-relaxed text-slate-600 rise" style="--d: 240ms">
+          {{ p.description }}
+        </p>
+
+        <!-- Purchase -->
+        <div class="buy rise" style="--d: 300ms">
+          <div class="stepper" [class.disabled]="stock() === 0" role="group" aria-label="Quantity">
+            <button type="button" (click)="decrement()" [disabled]="stock() === 0 || quantity() <= minQuantity()" aria-label="Decrease quantity">
+              <mat-icon>remove</mat-icon>
+            </button>
+            <output aria-live="polite">{{ quantity() }}</output>
+            <button type="button" (click)="increment()" [disabled]="quantity() >= stock()" aria-label="Increase quantity">
+              <mat-icon>add</mat-icon>
+            </button>
+          </div>
+
+          <button type="button" class="btn-primary buy-btn" [class.danger]="action().icon === 'delete_outline'"
+            [disabled]="action().disabled" (click)="updateCart()">
+            <mat-icon>{{ action().icon }}</mat-icon>
+            {{ action().label }}
+          </button>
+        </div>
+
+        @if (quantityInCart() > 0) {
+          <a routerLink="/cart" class="in-bag rise">
+            <mat-icon>shopping_bag</mat-icon>
+            You have {{ quantityInCart() }} in your bag
+            <span class="go">View bag <mat-icon class="arrow">arrow_forward</mat-icon></span>
+          </a>
+        }
+
+        <!-- Details -->
+        <dl class="specs rise" style="--d: 360ms">
+          <div><dt>Brand</dt><dd>{{ p.brand }}</dd></div>
+          <div><dt>Category</dt><dd>{{ p.type }}</dd></div>
+          <div><dt>Availability</dt><dd>{{ p.quantityInStock > 0 ? p.quantityInStock + ' in stock' : 'Sold out' }}</dd></div>
+        </dl>
+
+        <ul class="perks rise" style="--d: 420ms">
+          <li><mat-icon>lock</mat-icon> Secure checkout</li>
+          <li><mat-icon>bolt</mat-icon> Fast delivery</li>
+          <li><mat-icon>verified</mat-icon> Designer houses</li>
+        </ul>
+      </div>
     </section>
-}
+
+    <!-- ============ RELATED ============ -->
+    @if (related().length) {
+      <section class="mt-28">
+        <div class="mb-10 flex flex-wrap items-end justify-between gap-4 reveal">
+          <div>
+            <span class="eyebrow"><span class="spark">✦</span> Keep exploring</span>
+            <h2 class="display mt-4 text-3xl sm:text-4xl">You may also like</h2>
+          </div>
+          <a routerLink="/shop" class="link-arrow">
+            View all <mat-icon class="arrow">arrow_forward</mat-icon>
+          </a>
+        </div>
+        <div class="related">
+          @for (r of related(); track r.id) {
+            <app-product-item [product]="r" class="reveal"></app-product-item>
+          }
+        </div>
+      </section>
+    }
+  } @else if (notFound()) {
+    <div class="empty">
+      <span class="empty-icon"><mat-icon>search_off</mat-icon></span>
+      <h1 class="display mt-6 text-3xl">We couldn’t find that scent</h1>
+      <p class="mt-2 text-slate-600">It may have been removed or the link is incorrect.</p>
+      <a routerLink="/shop" class="btn-primary mt-8">
+        <mat-icon class="arrow">arrow_back</mat-icon> Back to shop
+      </a>
+    </div>
+  } @else {
+    <!-- Skeleton -->
+    <div class="mt-14 grid gap-10 lg:grid-cols-[1.1fr_1fr] lg:gap-16" aria-hidden="true">
+      <div class="sk sk-stage"></div>
+      <div class="flex flex-col gap-5 pt-6">
+        <div class="sk h-6 w-28 rounded-full"></div>
+        <div class="sk h-14 w-3/4 rounded-xl"></div>
+        <div class="sk h-8 w-40 rounded-xl"></div>
+        <div class="sk h-24 w-full rounded-xl"></div>
+        <div class="sk h-14 w-2/3 rounded-full"></div>
+      </div>
+    </div>
+  }
+</div>

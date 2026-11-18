@@ -1,0 +1,261 @@
+@use '@angular/material' as mat;
+
+// Shared tokens, type, buttons and .aurora live in src/brand.scss.
+
+:host {
+  display: block;
+  color: var(--brand-navy);
+}
+
+/* ---------- Header band ---------- */
+.band {
+  background: linear-gradient(160deg, #ffffff 0%, #eef6ff 55%, #e5f6f8 100%);
+  border: 1px solid rgb(13 27 62 / 0.06);
+  box-shadow: 0 30px 80px -50px rgb(13 27 62 / 0.3);
+  animation: breeze-rise 0.8s var(--ease-out) both;
+}
+
+.search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 26rem;
+
+  input {
+    width: 100%;
+    height: 3.5rem;
+    padding: 0 3rem;
+    border-radius: 999px;
+    border: 1px solid rgb(13 27 62 / 0.1);
+    background: rgb(255 255 255 / 0.85);
+    backdrop-filter: blur(10px);
+    font: inherit;
+    font-size: 0.95rem;
+    color: var(--brand-navy);
+    box-shadow: 0 10px 30px -18px rgb(13 27 62 / 0.4);
+    transition: border-color 0.25s, box-shadow 0.25s;
+
+    &::placeholder { color: #94a3b8; }
+    &::-webkit-search-cancel-button { display: none; }
+    &:focus {
+      outline: none;
+      border-color: rgb(47 127 240 / 0.5);
+      box-shadow: 0 0 0 4px rgb(47 127 240 / 0.15), 0 10px 30px -18px rgb(13 27 62 / 0.4);
+    }
+  }
+}
+
+.search-icon {
+  position: absolute;
+  left: 1.1rem;
+  color: #64748b;
+  pointer-events: none;
+}
+
+.search-clear {
+  position: absolute;
+  right: 0.6rem;
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 0;
+  border-radius: 50%;
+  background: rgb(13 27 62 / 0.06);
+  color: var(--brand-navy);
+  cursor: pointer;
+  transition: background 0.2s;
+
+  &:hover { background: rgb(13 27 62 / 0.12); }
+  mat-icon { font-size: 1.1rem; width: 1.1rem; height: 1.1rem; }
+}
+
+/* ---------- Toolbar ---------- */
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 2rem 0 2.25rem;
+}
+
+.chips {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 0.25rem 0.25rem 0.25rem 0;
+  mask-image: linear-gradient(90deg, #000 92%, transparent);
+
+  &::-webkit-scrollbar { display: none; }
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-shrink: 0;
+  padding: 0.55rem 1rem;
+  border-radius: 999px;
+  border: 1px solid rgb(13 27 62 / 0.12);
+  background: #fff;
+  color: var(--brand-navy);
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.25s var(--ease-out);
+
+  mat-icon { font-size: 1rem; width: 1rem; height: 1rem; }
+
+  &:hover { border-color: rgb(47 127 240 / 0.45); transform: translateY(-1px); }
+  &:focus-visible { outline: 3px solid rgb(47 127 240 / 0.45); outline-offset: 2px; }
+
+  &.on {
+    background: var(--brand-navy);
+    border-color: var(--brand-navy);
+    color: #fff;
+    box-shadow: 0 8px 20px -10px rgb(13 27 62 / 0.6);
+  }
+
+  &.chip-type.on {
+    background: linear-gradient(135deg, var(--brand-blue), #39a8e6);
+    border-color: transparent;
+  }
+}
+
+.divider {
+  flex-shrink: 0;
+  width: 1px;
+  height: 1.5rem;
+  margin: 0 0.25rem;
+  background: rgb(13 27 62 / 0.12);
+}
+
+.text-btn,
+.sort-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s var(--ease-out);
+
+  mat-icon { font-size: 1.15rem; width: 1.15rem; height: 1.15rem; }
+  &:focus-visible { outline: 3px solid rgb(47 127 240 / 0.45); outline-offset: 2px; }
+}
+
+.text-btn {
+  padding: 0.55rem 0.8rem;
+  border: 0;
+  background: transparent;
+  color: var(--brand-blue);
+  &:hover { background: rgb(47 127 240 / 0.08); }
+}
+
+.sort-btn {
+  padding: 0.55rem 0.8rem 0.55rem 1rem;
+  border: 1px solid rgb(13 27 62 / 0.12);
+  background: #fff;
+  color: var(--brand-navy);
+
+  .caret { color: #64748b; }
+  &:hover { border-color: rgb(47 127 240 / 0.45); box-shadow: 0 8px 20px -14px rgb(13 27 62 / 0.5); }
+}
+
+::ng-deep .sort-active { color: var(--brand-blue) !important; font-weight: 600; }
+
+/* ---------- Grid ---------- */
+.grid-products {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
+  gap: 2.5rem 1.75rem;
+  transition: opacity 0.3s;
+
+  &.dim { opacity: 0.45; pointer-events: none; }
+}
+
+.pop {
+  animation: breeze-rise 0.6s var(--ease-out) both;
+  animation-delay: calc(var(--i, 0) * 50ms);
+}
+
+.skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+
+  .sk-media {
+    aspect-ratio: 4 / 5;
+    border-radius: 1.5rem;
+    background: #eef2f7;
+  }
+  .sk-line {
+    height: 0.9rem;
+    border-radius: 0.5rem;
+    background: #e2e8f0;
+  }
+  > * { animation: pulse-bg 1.4s ease-in-out infinite; }
+}
+
+/* ---------- Pager ---------- */
+.pager {
+  display: flex;
+  justify-content: center;
+  margin-top: 3.5rem;
+
+  mat-paginator {
+    border-radius: 999px;
+    padding: 0 0.75rem;
+    border: 1px solid rgb(13 27 62 / 0.08);
+    box-shadow: 0 12px 30px -20px rgb(13 27 62 / 0.4);
+    @include mat.paginator-overrides((
+      container-background-color: #fff,
+      container-text-color: var(--brand-navy),
+    ));
+  }
+}
+
+/* ---------- Empty ---------- */
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 5rem 1rem;
+  animation: breeze-rise 0.6s var(--ease-out) both;
+}
+
+.empty-icon {
+  display: grid;
+  place-items: center;
+  width: 5rem;
+  height: 5rem;
+  border-radius: 1.5rem;
+  background: linear-gradient(135deg, #e8f1ff, #e6f7f4);
+  color: var(--brand-blue);
+  transform: rotate(-6deg);
+
+  mat-icon { font-size: 2.25rem; width: 2.25rem; height: 2.25rem; }
+}
+
+@keyframes pulse-bg {
+  50% { opacity: 0.5; }
+}
+
+@media (max-width: 640px) {
+  .toolbar { flex-direction: column; align-items: stretch; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

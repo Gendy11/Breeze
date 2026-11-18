@@ -1,70 +1,141 @@
-<div class="flex mt-3">
-    <div class="w-3/4">
-        <mat-stepper (selectionChange)="onStepChange($event)" #stepper class="bg-white border border-gray-200 shadow-sm"
-            [linear]="true">
-            <mat-step label="Address" [completed]="completionStatus().address">
-                <div id="address-element"></div>
-                <div class="flex justify-end mt-1">
-                    <mat-checkbox [checked]="saveAddress" (change)="onSaveAddressCheckboxChange($event)">Save as default
-                        address</mat-checkbox>
-                </div>
-                <div class="flex justify-between mt-6">
-                    <button routerLink="/shop" mat-stroked-button>Continue shopping</button>
-                    <button [disabled]="!completionStatus().address" matStepperNext mat-flat-button>Next</button>
-                </div>
-            </mat-step>
-            <mat-step label="Shipping" [completed]="completionStatus().delivery">
-                <app-checkout-delivery (deliveryComplete)="handleDeliveryChange($event)"></app-checkout-delivery>
-                <div class="flex justify-between mt-6">
-                    <button matStepperPrevious mat-stroked-button>Back</button>
-                    <button [disabled]="!completionStatus().delivery" matStepperNext mat-flat-button>Next</button>
-                </div>
-            </mat-step>
-            <mat-step label="Payment" [completed]="cartService.selectedPaymentMethod() !== null">
-
-                <!-- Payment Method Selection -->
-                <div class="mb-4">
-                    <mat-radio-group [value]="cartService.selectedPaymentMethod()" (change)="onPaymentMethodChange($event.value)">
-                        <mat-radio-button class="ml-4" value="cod">Cash on delivery</mat-radio-button>
-                        <mat-radio-button value="card">Pay by card</mat-radio-button>
-                    </mat-radio-group>
-                </div>
-
-                <div [style.display]="cartService.selectedPaymentMethod() === 'card' ? 'block' : 'none'">
-                    <div id="payment-element"></div>
-                </div>
-
-
-                <div class="flex justify-between mt-6">
-                    <button matStepperPrevious mat-stroked-button>Back</button>
-
-                    <button [disabled]="!completionStatus().card && cartService.selectedPaymentMethod() === 'card'" matStepperNext mat-flat-button>
-                        Next
-                    </button>
-                </div>
-            </mat-step>
-
-            <mat-step label="Confirmation">
-                <app-checkout-review [confirmationToken]="confirmationToken"></app-checkout-review>
-                <div class="flex justify-between mt-6">
-                    <button matStepperPrevious mat-stroked-button>Back</button>
-                    <button [disabled]="(!confirmationToken && this.cartService.selectedPaymentMethod() === 'card') || loading"
-                        mat-flat-button (click)="confirmOrder(stepper)">
-                        @if(loading){
-                        <mat-spinner diameter="20"></mat-spinner>
-                        }@else{
-                            @if (this.cartService.selectedPaymentMethod() === 'card') {
-                            <span>Pay {{cartService.totals()?.total| currency:'EGP ':true}}</span>
-                            } @else {
-                            <span>Confirm Order</span>
-                            }
-                            }
-                    </button>
-                </div>
-            </mat-step>
-        </mat-stepper>
+<div class="checkout max-w-screen-2xl mx-auto px-2 sm:px-4 pb-16">
+  <!-- Heading -->
+  <header class="mb-10 flex flex-wrap items-end justify-between gap-4 rise">
+    <div>
+      <span class="eyebrow"><span class="spark">✦</span> Almost yours</span>
+      <h1 class="display mt-4 text-4xl sm:text-5xl">Secure <em class="shimmer">checkout</em></h1>
     </div>
-    <div class="w-1/4">
-        <app-order-summary></app-order-summary>
+    <span class="secure-note"><mat-icon>lock</mat-icon> Payments encrypted by Stripe</span>
+  </header>
+
+  <div class="grid items-start gap-8 lg:grid-cols-[1fr_24rem] xl:gap-12">
+    <div class="panel rise" style="--d: 80ms">
+      <mat-stepper (selectionChange)="onStepChange($event)" #stepper [linear]="true" class="breeze-stepper">
+
+        <!-- ============ 1. ADDRESS ============ -->
+        <mat-step label="Address" [completed]="completionStatus().address">
+          <div class="step-head">
+            <span class="step-icon"><mat-icon>home_pin</mat-icon></span>
+            <div>
+              <h2 class="display text-2xl">Where should we send it?</h2>
+              <p class="text-slate-600">Enter the address for your delivery.</p>
+            </div>
+          </div>
+
+          <div id="address-element" class="stripe-box"></div>
+
+          <div class="save-address">
+            <mat-checkbox [checked]="saveAddress" (change)="onSaveAddressCheckboxChange($event)">
+              Save as my default address
+            </mat-checkbox>
+          </div>
+
+          <div class="step-actions">
+            <a routerLink="/shop" class="btn-ghost"><mat-icon>arrow_back</mat-icon> Continue shopping</a>
+            <button type="button" class="btn-primary" [disabled]="!completionStatus().address" matStepperNext>
+              Continue to delivery <mat-icon class="arrow">arrow_forward</mat-icon>
+            </button>
+          </div>
+        </mat-step>
+
+        <!-- ============ 2. DELIVERY ============ -->
+        <mat-step label="Delivery" [completed]="completionStatus().delivery">
+          <div class="step-head">
+            <span class="step-icon"><mat-icon>local_shipping</mat-icon></span>
+            <div>
+              <h2 class="display text-2xl">Choose your delivery</h2>
+              <p class="text-slate-600">Pick the option that suits you best.</p>
+            </div>
+          </div>
+
+          <app-checkout-delivery (deliveryComplete)="handleDeliveryChange($event)"></app-checkout-delivery>
+
+          <div class="step-actions">
+            <button type="button" class="btn-ghost" matStepperPrevious><mat-icon>arrow_back</mat-icon> Back</button>
+            <button type="button" class="btn-primary" [disabled]="!completionStatus().delivery" matStepperNext>
+              Continue to payment <mat-icon class="arrow">arrow_forward</mat-icon>
+            </button>
+          </div>
+        </mat-step>
+
+        <!-- ============ 3. PAYMENT ============ -->
+        <mat-step label="Payment" [completed]="cartService.selectedPaymentMethod() !== null">
+          <div class="step-head">
+            <span class="step-icon"><mat-icon>account_balance_wallet</mat-icon></span>
+            <div>
+              <h2 class="display text-2xl">How would you like to pay?</h2>
+              <p class="text-slate-600">Choose a payment method.</p>
+            </div>
+          </div>
+
+          <div class="choice-grid" role="radiogroup" aria-label="Payment method">
+            <label class="choice" [class.on]="cartService.selectedPaymentMethod() === 'cod'">
+              <input type="radio" name="payment" value="cod"
+                [checked]="cartService.selectedPaymentMethod() === 'cod'" (change)="onPaymentMethodChange('cod')" />
+              <span class="choice-icon"><mat-icon>payments</mat-icon></span>
+              <span class="choice-text">
+                <strong>Cash on delivery</strong>
+                <span>Pay when your order arrives</span>
+              </span>
+              <span class="radio-dot" aria-hidden="true"></span>
+            </label>
+
+            <label class="choice" [class.on]="cartService.selectedPaymentMethod() === 'card'">
+              <input type="radio" name="payment" value="card"
+                [checked]="cartService.selectedPaymentMethod() === 'card'" (change)="onPaymentMethodChange('card')" />
+              <span class="choice-icon"><mat-icon>credit_card</mat-icon></span>
+              <span class="choice-text">
+                <strong>Pay by card</strong>
+                <span>Secure payment with Stripe</span>
+              </span>
+              <span class="radio-dot" aria-hidden="true"></span>
+            </label>
+          </div>
+
+          <div class="stripe-box mt-6" [style.display]="cartService.selectedPaymentMethod() === 'card' ? 'block' : 'none'">
+            <div id="payment-element"></div>
+          </div>
+
+          <div class="step-actions">
+            <button type="button" class="btn-ghost" matStepperPrevious><mat-icon>arrow_back</mat-icon> Back</button>
+            <button type="button" class="btn-primary" matStepperNext
+              [disabled]="!completionStatus().card && cartService.selectedPaymentMethod() === 'card'">
+              Review order <mat-icon class="arrow">arrow_forward</mat-icon>
+            </button>
+          </div>
+        </mat-step>
+
+        <!-- ============ 4. CONFIRM ============ -->
+        <mat-step label="Confirm">
+          <div class="step-head">
+            <span class="step-icon"><mat-icon>task_alt</mat-icon></span>
+            <div>
+              <h2 class="display text-2xl">Review and confirm</h2>
+              <p class="text-slate-600">Check everything looks right before placing your order.</p>
+            </div>
+          </div>
+
+          <app-checkout-review [confirmationToken]="confirmationToken"></app-checkout-review>
+
+          <div class="step-actions">
+            <button type="button" class="btn-ghost" matStepperPrevious><mat-icon>arrow_back</mat-icon> Back</button>
+            <button type="button" class="btn-primary place-order" (click)="confirmOrder(stepper)"
+              [disabled]="(!confirmationToken && cartService.selectedPaymentMethod() === 'card') || loading">
+              @if (loading) {
+                <mat-spinner diameter="20"></mat-spinner> Placing order…
+              } @else if (cartService.selectedPaymentMethod() === 'card') {
+                <mat-icon>lock</mat-icon> Pay {{ cartService.totals()?.total | currency: 'EGP ' : 'symbol' : '1.0-0' }}
+              } @else {
+                <mat-icon>check_circle</mat-icon> Place order
+              }
+            </button>
+          </div>
+        </mat-step>
+      </mat-stepper>
     </div>
+
+    <aside class="summary-col rise" style="--d: 160ms">
+      <app-order-summary></app-order-summary>
+    </aside>
+  </div>
 </div>

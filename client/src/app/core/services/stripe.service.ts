@@ -35,7 +35,25 @@ export class StripeService {
         const cart = await firstValueFrom(this.createOrUpdatePaymentIntent());
         this.elements = stripe.elements({
           clientSecret: cart.clientSecret,
-          appearance: { labels: 'floating' }
+          appearance: {
+            labels: 'floating',
+            theme: 'stripe',
+            variables: {
+              colorPrimary: '#2f7ff0',
+              colorText: '#0d1b3e',
+              colorTextSecondary: '#64748b',
+              colorDanger: '#b91c1c',
+              borderRadius: '14px',
+              spacingUnit: '4px',
+              fontFamily: 'Roboto, "Helvetica Neue", sans-serif'
+            },
+            rules: {
+              '.Input': { border: '1px solid rgba(13, 27, 62, 0.12)', boxShadow: 'none' },
+              '.Input:focus': { borderColor: '#2f7ff0', boxShadow: '0 0 0 4px rgba(47, 127, 240, 0.15)' },
+              '.Tab': { border: '1px solid rgba(13, 27, 62, 0.12)', boxShadow: 'none' },
+              '.Tab--selected': { borderColor: '#2f7ff0', boxShadow: '0 0 0 1px #2f7ff0' }
+            }
+          }
         })
       }
       else {

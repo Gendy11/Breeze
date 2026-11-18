@@ -2,8 +2,8 @@ import { Component, inject, OnInit } from '@angular/core';
 import { OrderService } from '../../../core/services/order.service';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Order } from '../../../shared/models/order';
-import {MatCardModule } from '@angular/material/card';
-import { MatButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
+import { OrderStatusComponent } from '../../../shared/components/order-status/order-status.component';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { AddressPipe } from "../../../shared/pipes/address-pipe";
 import { PaymentPipe } from "../../../shared/pipes/payment-pipe";
@@ -13,8 +13,8 @@ import { AdminService } from '../../../core/services/admin.service';
 @Component({
   selector: 'app-order-detailed',
   imports: [
-    MatCardModule,
-    MatButton,
+    MatIcon,
+    OrderStatusComponent,
     DatePipe,
     CurrencyPipe,
     AddressPipe,
@@ -31,6 +31,8 @@ export class OrderDetailedComponent implements OnInit {
   private adminService = inject(AdminService)
   private router = inject(Router)
   order?:Order;
+  /** Soft backgrounds for item thumbnails, matching the shop cards. */
+  tints = ['#e8f1ff', '#e6f7f4', '#f3eefe', '#fdf3e7'];
   buttonText = this.accountService.isAdmin() ? 'Return to admin' : 'Return to orders';
 
   ngOnInit(): void {
